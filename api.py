@@ -97,7 +97,7 @@ def get_status():
 @app.get("/producten")
 def get_producten():
     """Alle actieve producten ophalen uit Supabase"""
-    data = supabase_get("producten", "select=id,product_naam,status,categorie,primaire_kleur,soul_hex_kleuren,moodboard_status,research_gedaan,product_image_url&order=id.desc")
+    data = supabase_get("producten", "select=*&order=id.desc")
     return {"producten": data}
 
 @app.get("/pipeline-runs")
