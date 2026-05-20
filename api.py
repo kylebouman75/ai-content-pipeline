@@ -48,17 +48,32 @@ pipeline_status = {
 # ============================================================
 
 def supabase_get(tabel, filter=""):
-    req = urllib.request.Request(
-        f"{SUPABASE_URL}/rest/v1/{tabel}?{filter}",
-        method="GET"
-    )
+    url = f"{SUPABASE_URL}/rest/v1/{tabel}"
+    if filter:
+        url += f"?{filter}"
+    req = urllib.request.Request(url, method="GET")
     req.add_header("apikey", SUPABASE_KEY)
     req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+    req.add_header("Content-Type", "application/json")
     try:
         with urllib.request.urlopen(req) as r:
             return json.loads(r.read().decode())
-    except:
-        return []
+    except urllib.error.HTTPError as e:
+        return {"error": f"HTTP {e.code}", "detail": e.read().decode()}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+@app.get("/debug")
+def debug():
+    """Debug endpoint — test Supabase verbinding"""
+    # Test directe verbinding
+    result = supabase_get("producten", "select=id,product_naam,status&limit=5&order=id.desc")
+    return {
+        "supabase_url": SUPABASE_URL,
+        "key_start": SUPABASE_KEY[:20] + "...",
+        "result": result
+    }
 
 # ============================================================
 # ENDPOINTS
@@ -82,7 +97,7 @@ def get_status():
 @app.get("/producten")
 def get_producten():
     """Alle actieve producten ophalen uit Supabase"""
-    data = supabase_get("producten", "select=id,product_naam,status,categorie,primaire_kleur,soul_hex_kleuren,moodboard_status,research_gedaan,product_image_url&status=eq.Actief&order=id.desc")
+    data = supabase_get("producten", "select=id,product_naam,status,categorie,primaire_kleur,soul_hex_kleuren,moodboard_status,research_gedaan,product_image_url&order=id.desc")
     return {"producten": data}
 
 @app.get("/pipeline-runs")
