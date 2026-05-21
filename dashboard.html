@@ -8,90 +8,49 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0a0a0a;
-  --bg-card: #111111;
-  --bg-card-2: #161616;
-  --border: #1e1e1e;
-  --border-2: #2a2a2a;
-  --accent: #e03131;
-  --accent-dim: rgba(224,49,49,0.15);
-  --accent-glow: rgba(224,49,49,0.25);
-  --text: #e2e2e2;
-  --text-2: #999;
-  --text-3: #555;
-  --success: #22c55e;
-  --warn: #f59e0b;
-  --error: #ef4444;
-  --blue: #3b82f6;
-  --log-gold: #ffd700;
-  --log-green: #00d97e;
-  --log-red: #ff4d4d;
-  --log-orange: #ff8c00;
-  --log-dim: #888;
+  --bg: #0a0a0a; --bg-card: #111; --bg-card-2: #161616;
+  --border: #1e1e1e; --border-2: #2a2a2a;
+  --accent: #e03131; --accent-dim: rgba(224,49,49,.15); --accent-glow: rgba(224,49,49,.25);
+  --text: #e2e2e2; --text-2: #999; --text-3: #555;
+  --success: #22c55e; --warn: #f59e0b; --error: #ef4444; --blue: #3b82f6;
+  --log-gold: #ffd700; --log-green: #00d97e; --log-red: #ff4d4d; --log-orange: #ff8c00; --log-dim: #888;
 }
 
 html, body { height: 100%; }
-
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  background: var(--bg); color: var(--text);
+  display: flex; flex-direction: column; height: 100vh; overflow: hidden;
 }
 
 /* ── HEADER ── */
 header {
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  height: 52px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-shrink: 0;
-  z-index: 50;
+  background: var(--bg-card); border-bottom: 1px solid var(--border);
+  padding: 0 20px; height: 52px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0; z-index: 50;
 }
 .hdr-left { display: flex; align-items: center; gap: 10px; }
-.hdr-logo  { font-size: 20px; line-height: 1; }
+.hdr-logo  { font-size: 20px; }
 .hdr-title { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
 .hdr-title em { color: var(--accent); font-style: normal; }
 .hdr-right { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-2); }
 
-.conn-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--text-3); flex-shrink: 0;
-  transition: background .3s, box-shadow .3s;
+.dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--text-3);
+  flex-shrink: 0; transition: background .3s, box-shadow .3s;
 }
-.conn-dot.ok  { background: var(--success); box-shadow: 0 0 6px var(--success); }
-.conn-dot.err { background: var(--error);   box-shadow: 0 0 6px var(--error); }
-.conn-dot.run { background: var(--blue);    box-shadow: 0 0 6px var(--blue); animation: pulse 1.4s ease-in-out infinite; }
+.dot.ok  { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.dot.err { background: var(--error);   box-shadow: 0 0 6px var(--error); }
+.dot.run { background: var(--blue);    box-shadow: 0 0 6px var(--blue); animation: pulse 1.4s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
 
 /* ── GRID ── */
-.grid {
-  display: grid;
-  grid-template-columns: 290px 1fr 300px;
-  flex: 1; overflow: hidden;
-}
-.col {
-  display: flex; flex-direction: column; overflow: hidden;
-  border-right: 1px solid var(--border);
-}
+.grid { display: grid; grid-template-columns: 290px 1fr 300px; flex: 1; overflow: hidden; }
+.col { display: flex; flex-direction: column; overflow: hidden; border-right: 1px solid var(--border); }
 .col:last-child { border-right: none; }
-.col-hdr {
-  padding: 12px 16px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  flex-shrink: 0;
-}
-.col-label {
-  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
-  text-transform: uppercase; color: var(--text-3);
-}
+.col-hdr { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+.col-label { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text-3); }
 .col-body { flex: 1; overflow-y: auto; padding: 14px; }
-
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
@@ -99,22 +58,16 @@ header {
 /* ── AGENTS ── */
 .agent-card {
   background: var(--bg-card); border: 1px solid var(--border-2);
-  border-radius: 8px; padding: 11px 13px;
-  transition: border-color .2s, box-shadow .2s;
+  border-radius: 8px; padding: 11px 13px; transition: border-color .2s, box-shadow .2s;
 }
-.agent-card.running { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), inset 0 0 20px rgba(59,130,246,.06); }
+.agent-card.running { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), inset 0 0 18px rgba(59,130,246,.06); }
 .agent-card.done    { border-color: var(--success); }
 .agent-card.error   { border-color: var(--error); }
 
 .agent-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
 .agent-name-wrap { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 12px; }
 .agent-icon { font-size: 14px; line-height: 1; }
-
-.status-chip {
-  display: inline-flex; align-items: center; gap: 4px;
-  font-size: 10px; font-weight: 600; padding: 2px 7px;
-  border-radius: 99px; letter-spacing: .4px;
-}
+.chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; letter-spacing: .4px; }
 .chip-wait  { background: rgba(85,85,85,.2);    color: #777; }
 .chip-run   { background: rgba(59,130,246,.15); color: #93c5fd; }
 .chip-done  { background: rgba(34,197,94,.15);  color: #86efac; }
@@ -124,11 +77,10 @@ header {
 .chip-run   .chip-dot { background: var(--blue); animation: pulse 1.2s infinite; }
 .chip-done  .chip-dot { background: var(--success); }
 .chip-error .chip-dot { background: var(--error); }
-
 .agent-desc { font-size: 11px; color: var(--text-2); }
-.flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 3px 0; color: var(--border-2); }
+.flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 3px 0; }
 .arrow-stem { width: 1px; height: 10px; background: var(--border-2); }
-.arrow-tip  { font-size: 9px; line-height: 1; }
+.arrow-tip  { font-size: 9px; line-height: 1; color: var(--border-2); }
 
 /* ── BUTTONS ── */
 .btn {
@@ -139,25 +91,20 @@ header {
 }
 .btn:disabled { opacity: .4; cursor: not-allowed; }
 .btn-red   { background: var(--accent); color: #fff; }
-.btn-red:hover:not(:disabled) { background: #c92a2a; box-shadow: 0 0 16px var(--accent-glow); }
+.btn-red:hover:not(:disabled)   { background: #c92a2a; box-shadow: 0 0 16px var(--accent-glow); }
 .btn-ghost { background: transparent; color: var(--text-2); border: 1px solid var(--border-2); font-size: 11px; padding: 5px 10px; }
 .btn-ghost:hover { color: var(--text); border-color: #444; }
 .btn-dark  { background: var(--bg-card-2); color: var(--text-2); border: 1px solid var(--border-2); }
-.btn-dark:hover:not(:disabled) { border-color: #444; color: var(--text); }
+.btn-dark:hover:not(:disabled)  { border-color: #444; color: var(--text); }
 .btn-green { background: rgba(34,197,94,.12); color: #86efac; border: 1px solid rgba(34,197,94,.25); font-size: 11px; padding: 6px 12px; }
 .btn-green:hover:not(:disabled) { background: rgba(34,197,94,.22); }
 .btn-amber { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); font-size: 11px; padding: 6px 12px; }
 .btn-amber:hover { background: rgba(245,158,11,.22); }
-.btn-sm { font-size: 11px; padding: 5px 10px; }
 .action-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
 
 /* ── TERMINAL ── */
 .term-col { background: #050505; }
-.term-topbar {
-  background: #0d0d0d; border-bottom: 1px solid var(--border);
-  padding: 10px 14px; display: flex; align-items: center;
-  justify-content: space-between; flex-shrink: 0;
-}
+.term-topbar { background: #0d0d0d; border-bottom: 1px solid var(--border); padding: 10px 14px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
 .term-macos { display: flex; gap: 5px; }
 .term-mac-dot { width: 10px; height: 10px; border-radius: 50%; }
 .mac-r { background: #ff5f56; } .mac-y { background: #ffbd2e; } .mac-g { background: #27c93f; }
@@ -171,9 +118,9 @@ header {
 .log-ts  { color: #3a3a3a; flex-shrink: 0; font-size: 10px; padding-top: 2px; }
 .log-tag { font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; flex-shrink: 0; align-self: flex-start; margin-top: 3px; letter-spacing: .5px; }
 .log-txt { flex: 1; }
-.lt-pipe  .log-txt { color: var(--log-gold); }   .lt-pipe  .log-tag { background: rgba(255,215,0,.12); color: var(--log-gold); }
-.lt-ok    .log-txt { color: var(--log-green); }  .lt-ok    .log-tag { background: rgba(0,217,126,.12); color: var(--log-green); }
-.lt-err   .log-txt { color: var(--log-red); }    .lt-err   .log-tag { background: rgba(255,77,77,.12); color: var(--log-red); }
+.lt-pipe  .log-txt { color: var(--log-gold); }   .lt-pipe  .log-tag { background: rgba(255,215,0,.12);  color: var(--log-gold); }
+.lt-ok    .log-txt { color: var(--log-green); }  .lt-ok    .log-tag { background: rgba(0,217,126,.12);  color: var(--log-green); }
+.lt-err   .log-txt { color: var(--log-red); }    .lt-err   .log-tag { background: rgba(255,77,77,.12);  color: var(--log-red); }
 .lt-agent .log-txt { color: var(--log-orange); } .lt-agent .log-tag { background: rgba(255,140,0,.12); color: var(--log-orange); }
 .lt-info  .log-txt { color: var(--log-dim); }    .lt-info  .log-tag { background: rgba(136,136,136,.12); color: #666; }
 .term-empty { color: #333; font-style: italic; font-size: 12px; font-family: monospace; }
@@ -181,197 +128,122 @@ header {
 @keyframes blink { 50% { opacity: 0; } }
 
 /* ── PRODUCTS ── */
-.pipe-status-bar {
-  background: var(--bg-card); border: 1px solid var(--border-2);
-  border-radius: 8px; padding: 10px 13px; margin-bottom: 12px;
-  display: flex; align-items: center; gap: 8px;
-}
+.pipe-status-bar { background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 8px; padding: 10px 13px; margin-bottom: 12px; }
 .psb-label { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .psb-sub   { font-size: 10px; color: var(--text-3); margin-top: 3px; }
-
-.prod-card {
-  background: var(--bg-card); border: 1px solid var(--border-2);
-  border-radius: 8px; padding: 11px 13px; margin-bottom: 8px;
-  transition: border-color .2s;
-}
+.prod-card { background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 8px; padding: 11px 13px; margin-bottom: 8px; transition: border-color .2s; }
 .prod-card:hover { border-color: #333; }
-.prod-card.has-manual { border-color: rgba(34,197,94,.25); }
-
+.prod-card.has-manual { border-color: rgba(34,197,94,.3); }
 .prod-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .prod-name { font-size: 12px; font-weight: 600; line-height: 1.3; }
 .prod-id   { font-size: 10px; color: var(--text-3); font-family: monospace; margin-top: 2px; }
-
-.prod-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; letter-spacing: .4px; }
+.prod-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; }
 .pb-active  { background: rgba(34,197,94,.15);  color: #86efac; }
 .pb-running { background: rgba(59,130,246,.15); color: #93c5fd; }
 .pb-pending { background: rgba(245,158,11,.15); color: #fcd34d; }
 .pb-idle    { background: rgba(80,80,80,.2);    color: #777; }
 .pb-error   { background: rgba(239,68,68,.15);  color: #fca5a5; }
-
-/* Agent progress steps inside product card */
-.prod-steps {
-  display: flex; gap: 5px; margin-bottom: 9px; flex-wrap: wrap;
-}
-.prod-step {
-  display: inline-flex; align-items: center; gap: 3px;
-  font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600;
-}
-.step-done    { background: rgba(34,197,94,.12); color: #86efac; }
+.prod-steps { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
+.prod-step  { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+.step-done    { background: rgba(34,197,94,.12);  color: #86efac; }
 .step-next    { background: rgba(245,158,11,.12); color: #fcd34d; }
-.step-pending { background: rgba(60,60,60,.3);   color: #555; }
-
-.prod-next-hint {
-  font-size: 10px; color: var(--text-3); margin-bottom: 8px;
-  display: flex; align-items: center; gap: 5px;
-}
-.prod-next-hint::before { content: '→'; color: var(--accent); }
-
+.step-pending { background: rgba(60,60,60,.3);    color: #555; }
+.prod-hint    { font-size: 10px; color: var(--text-3); margin-bottom: 8px; padding-left: 4px; border-left: 2px solid var(--border-2); }
 .prod-actions { display: flex; gap: 6px; flex-wrap: wrap; }
-
 .add-btn-wrap { margin-top: 4px; }
 .add-btn-wrap .btn { width: 100%; }
-
 .empty-state { text-align: center; padding: 28px 12px; color: var(--text-3); }
-.empty-ico   { font-size: 28px; margin-bottom: 8px; opacity: .5; }
-.empty-txt   { font-size: 12px; line-height: 1.5; }
+.empty-ico { font-size: 28px; margin-bottom: 8px; opacity: .5; }
+.empty-txt { font-size: 12px; line-height: 1.5; }
 
 /* ── MODAL ── */
 .overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.85);
+  position: fixed; inset: 0; background: rgba(0,0,0,.86);
   backdrop-filter: blur(6px); z-index: 200;
   display: flex; align-items: center; justify-content: center;
   padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
 }
 .overlay.open { opacity: 1; pointer-events: all; }
-
 .modal {
-  background: var(--bg-card); border: 1px solid #2e2e2e;
-  border-radius: 12px; width: 100%; max-width: 520px;
-  max-height: 88vh; display: flex; flex-direction: column;
+  background: var(--bg-card); border: 1px solid #2e2e2e; border-radius: 12px;
+  width: 100%; max-width: 540px; max-height: 90vh;
+  display: flex; flex-direction: column; overflow: hidden;
   transform: translateY(18px); transition: transform .2s;
-  overflow: hidden;
 }
 .overlay.open .modal { transform: translateY(0); }
 
-.modal-hdr {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 18px; border-bottom: 1px solid var(--border);
-  flex-shrink: 0;
-}
-.modal-ttl { font-size: 14px; font-weight: 700; }
-.modal-ttl em { color: var(--accent); font-style: normal; }
-.modal-close {
-  background: none; border: none; color: var(--text-3); font-size: 18px;
-  cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px;
-  transition: color .15s;
-}
+/* Modal header */
+.modal-hdr { display: flex; align-items: center; justify-content: space-between; padding: 15px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.modal-title { font-size: 14px; font-weight: 700; }
+.modal-title em { color: var(--accent); font-style: normal; }
+.modal-close { background: none; border: none; color: var(--text-3); font-size: 18px; cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: color .15s; line-height: 1; }
 .modal-close:hover { color: var(--text); }
 
-/* Wizard progress bar */
-.wizard-bar {
-  display: flex; align-items: center; padding: 10px 18px;
-  border-bottom: 1px solid var(--border); gap: 6px; flex-shrink: 0;
-}
-.wz-step {
-  display: flex; align-items: center; gap: 5px;
-  font-size: 10px; font-weight: 600; color: var(--text-3);
-  letter-spacing: .4px;
-}
-.wz-step.active { color: var(--text); }
-.wz-step.done   { color: var(--success); }
-.wz-num {
-  width: 18px; height: 18px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 700; background: var(--border-2); color: var(--text-3);
-}
-.wz-step.active .wz-num { background: var(--accent); color: #fff; }
-.wz-step.done   .wz-num { background: var(--success); color: #000; }
-.wz-sep { flex: 1; height: 1px; background: var(--border-2); }
+/* Wizard steps */
+.wiz-bar { display: flex; align-items: center; gap: 6px; padding: 10px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.wiz-step { display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; color: var(--text-3); letter-spacing: .4px; }
+.wiz-step.active { color: var(--text); }
+.wiz-step.done   { color: var(--success); }
+.wiz-num { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; background: var(--border-2); color: var(--text-3); }
+.wiz-step.active .wiz-num { background: var(--accent); color: #fff; }
+.wiz-step.done   .wiz-num { background: var(--success); color: #000; }
+.wiz-sep { flex: 1; height: 1px; background: var(--border-2); }
 
-/* Modal scrollable body */
-.modal-body {
-  overflow-y: auto; padding: 18px; flex: 1;
-}
+/* Modal body (scrolls) */
+.modal-body { overflow-y: auto; padding: 18px; flex: 1; }
 
-/* Form sections */
-.form-section { margin-bottom: 20px; }
+/* Modal footer */
+.modal-foot { padding: 13px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
+.modal-foot .btn { flex: 1; }
+
+/* ── FORM ELEMENTS ── */
+.form-section { margin-bottom: 22px; }
 .form-section:last-child { margin-bottom: 0; }
-.form-section-title {
-  font-size: 10px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px; color: var(--accent);
-  padding-bottom: 7px; margin-bottom: 10px;
-  border-bottom: 1px solid var(--border-2);
-}
+.fs-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); padding-bottom: 7px; margin-bottom: 11px; border-bottom: 1px solid var(--border-2); }
 .fg { margin-bottom: 11px; }
 .fg:last-child { margin-bottom: 0; }
 .flabel { display: block; font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 5px; }
-.finput {
-  width: 100%; background: var(--bg); border: 1px solid var(--border-2);
-  border-radius: 6px; padding: 8px 11px; color: var(--text);
-  font-size: 13px; font-family: inherit; outline: none;
-  transition: border-color .15s, box-shadow .15s;
-}
+.finput { width: 100%; background: var(--bg); border: 1px solid var(--border-2); border-radius: 6px; padding: 8px 11px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
 .finput:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
 .finput::placeholder { color: #444; }
 .finput-ta { resize: vertical; min-height: 72px; line-height: 1.5; }
 
-/* Modal footer (buttons) */
-.modal-foot {
-  padding: 14px 18px; border-top: 1px solid var(--border);
-  display: flex; gap: 8px; flex-shrink: 0;
-}
-.modal-foot .btn { flex: 1; }
+/* ── MODAL STATES ── */
 
-/* Loading state */
-.state-loading {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 48px 20px; gap: 14px;
-}
-.spinner {
-  width: 32px; height: 32px; border: 3px solid var(--border-2);
-  border-top-color: var(--accent); border-radius: 50%;
-  animation: spin .8s linear infinite;
-}
+/* Loading */
+.ms-loading-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 52px 20px; gap: 14px; }
+.spinner { width: 30px; height: 30px; border: 3px solid var(--border-2); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-.state-loading-txt { font-size: 13px; color: var(--text-2); }
+.ms-loading-txt { font-size: 13px; color: var(--text-2); }
 
-/* Processing state */
-.state-processing { padding: 18px; }
-.proc-header {
-  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
-}
-.proc-title { font-size: 13px; font-weight: 600; }
-.proc-sub   { font-size: 11px; color: var(--text-2); margin-top: 2px; }
-
+/* Processing */
+.ms-proc-inner { padding: 18px; }
+.proc-hdr { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.proc-title { font-size: 13px; font-weight: 600; margin-bottom: 3px; }
+.proc-sub   { font-size: 11px; color: var(--text-2); }
 .mini-term {
-  background: #050505; border: 1px solid var(--border);
-  border-radius: 6px; padding: 10px 12px; height: 160px;
-  overflow-y: auto; font-family: monospace; font-size: 11px;
-  color: #777; line-height: 1.6;
+  background: #050505; border: 1px solid var(--border); border-radius: 6px;
+  padding: 10px 12px; height: 180px; overflow-y: auto;
+  font-family: monospace; font-size: 11px; line-height: 1.6;
 }
-.mini-log-line { padding: 1px 0; word-break: break-all; }
-.mini-log-line.log-ok  { color: var(--log-green); }
-.mini-log-line.log-err { color: var(--log-red); }
-.mini-log-line.log-ag  { color: var(--log-orange); }
-.mini-empty { color: #333; font-style: italic; }
+.mini-line { padding: 1px 0; word-break: break-all; }
+.mini-line.ok  { color: var(--log-green); }
+.mini-line.err { color: var(--log-red); }
+.mini-line.ag  { color: var(--log-orange); }
+.mini-line.dim { color: #555; }
+.mini-empty-txt { color: #333; font-style: italic; }
 
-/* Done state */
-.state-done {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 32px 20px 20px; gap: 10px; text-align: center;
-}
-.done-ico { font-size: 44px; color: var(--success); line-height: 1; }
+/* Done */
+.ms-done-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 34px 20px 20px; gap: 10px; text-align: center; }
+.done-ico   { font-size: 48px; color: var(--success); line-height: 1; }
 .done-title { font-size: 16px; font-weight: 700; }
 .done-sub   { font-size: 12px; color: var(--text-2); }
 
-/* Error state */
-.state-error {
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; padding: 32px 20px 20px; gap: 10px; text-align: center;
-}
+/* Error */
+.ms-err-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 34px 20px 20px; gap: 10px; text-align: center; }
 .err-ico   { font-size: 44px; color: var(--error); line-height: 1; }
 .err-title { font-size: 15px; font-weight: 700; }
-.err-msg   { font-size: 12px; color: var(--text-2); max-width: 340px; line-height: 1.5; }
+.err-sub   { font-size: 12px; color: var(--text-2); max-width: 340px; line-height: 1.5; }
 
 /* ── TOAST ── */
 #toasts { position: fixed; bottom: 18px; right: 18px; z-index: 300; display: flex; flex-direction: column; gap: 7px; pointer-events: none; }
@@ -402,28 +274,28 @@ header {
     <h1 class="hdr-title">AI Content <em>Pipeline</em></h1>
   </div>
   <div class="hdr-right">
-    <div class="conn-dot" id="connDot"></div>
+    <div class="dot" id="connDot"></div>
     <span id="connTxt">Verbinden...</span>
     <span id="lastUpdated" style="color:var(--text-3)"></span>
   </div>
 </header>
 
-<!-- MAIN GRID -->
+<!-- GRID -->
 <div class="grid">
 
-  <!-- ═══ KOLOM 1: Pipeline overzicht ═══ -->
+  <!-- ═══ L: Agents ═══ -->
   <div class="col">
     <div class="col-hdr"><span class="col-label">Pipeline Overzicht</span></div>
     <div class="col-body">
       <div id="agentFlow"></div>
       <div class="action-btns">
-        <button class="btn btn-red" id="btnStart" onclick="pipelineStart(null, null)">▶&ensp;Pipeline Starten</button>
+        <button class="btn btn-red"  id="btnStart" onclick="pipelineStart(null,null)">▶&ensp;Pipeline Starten</button>
         <button class="btn btn-dark" id="btnStop"  onclick="pipelineStop()">⬛&ensp;Pipeline Stoppen</button>
       </div>
     </div>
   </div>
 
-  <!-- ═══ KOLOM 2: Live terminal ═══ -->
+  <!-- ═══ M: Terminal ═══ -->
   <div class="col term-col">
     <div class="term-topbar">
       <div class="term-macos">
@@ -439,27 +311,20 @@ header {
     </div>
   </div>
 
-  <!-- ═══ KOLOM 3: Producten ═══ -->
+  <!-- ═══ R: Producten ═══ -->
   <div class="col">
     <div class="col-hdr"><span class="col-label">Producten &amp; Acties</span></div>
     <div class="col-body">
       <div class="pipe-status-bar">
-        <div>
-          <div class="psb-label">
-            <div class="conn-dot" id="pipeDot"></div>
-            <span id="pipeLabelTxt">Onbekend</span>
-          </div>
-          <div class="psb-sub" id="pipeLastRun">Laatste run: —</div>
+        <div class="psb-label">
+          <div class="dot" id="pipeDot"></div>
+          <span id="pipeTxt">Onbekend</span>
         </div>
+        <div class="psb-sub" id="pipeLastRun">Laatste run: —</div>
       </div>
-
       <div id="productList">
-        <div class="empty-state">
-          <div class="empty-ico">📦</div>
-          <div class="empty-txt">Producten laden…</div>
-        </div>
+        <div class="empty-state"><div class="empty-ico">📦</div><div class="empty-txt">Producten laden…</div></div>
       </div>
-
       <div class="add-btn-wrap">
         <button class="btn btn-red" onclick="openModal()">+&ensp;Nieuw Product Toevoegen</button>
       </div>
@@ -468,35 +333,29 @@ header {
 </div>
 
 <!-- ═══ MODAL: Multi-step wizard ═══ -->
-<div class="overlay" id="overlay" onclick="overlayClick(event)">
+<div class="overlay" id="overlay" onclick="overlayOutside(event)">
   <div class="modal">
 
     <!-- Header -->
     <div class="modal-hdr">
-      <div class="modal-ttl" id="modalTitle">Nieuw Product <em>Toevoegen</em></div>
+      <div class="modal-title" id="modalTitle">Nieuw Product <em>Toevoegen</em></div>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
 
-    <!-- Wizard progress bar -->
-    <div class="wizard-bar" id="wizardBar">
-      <div class="wz-step active" id="wz0">
-        <div class="wz-num">1</div><span>Vragen</span>
-      </div>
-      <div class="wz-sep"></div>
-      <div class="wz-step" id="wz1">
-        <div class="wz-num">2</div><span>Genereren</span>
-      </div>
-      <div class="wz-sep"></div>
-      <div class="wz-step" id="wz2">
-        <div class="wz-num">3</div><span>Klaar</span>
-      </div>
+    <!-- Wizard bar -->
+    <div class="wiz-bar">
+      <div class="wiz-step active" id="wz0"><div class="wiz-num">1</div><span>Vragen</span></div>
+      <div class="wiz-sep"></div>
+      <div class="wiz-step" id="wz1"><div class="wiz-num">2</div><span>Genereren</span></div>
+      <div class="wiz-sep"></div>
+      <div class="wiz-step" id="wz2"><div class="wiz-num">3</div><span>Klaar</span></div>
     </div>
 
     <!-- STATE: Loading questions -->
     <div id="ms-loading">
-      <div class="state-loading">
+      <div class="ms-loading-inner">
         <div class="spinner"></div>
-        <div class="state-loading-txt">Brand interview vragen laden…</div>
+        <div class="ms-loading-txt">Interview vragen laden via /agent0/vragen…</div>
       </div>
     </div>
 
@@ -504,59 +363,74 @@ header {
     <div id="ms-form" hidden>
       <form id="agentForm" onsubmit="submitAgent0(event)">
         <div class="modal-body">
-          <div id="formSections"></div>
+          <!-- Fixed product info — always shown -->
+          <div class="form-section" id="fixedSection">
+            <div class="fs-title">Product Informatie</div>
+            <div class="fg">
+              <label class="flabel" for="fp-url">Product URL *</label>
+              <input class="finput" id="fp-url" type="url" required placeholder="https://...">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div class="fg">
+                <label class="flabel" for="fp-land">Doelland</label>
+                <input class="finput" id="fp-land" type="text" value="Nederland">
+              </div>
+              <div class="fg">
+                <label class="flabel" for="fp-taal">Doeltaal</label>
+                <input class="finput" id="fp-taal" type="text" value="Nederlands">
+              </div>
+            </div>
+          </div>
+          <!-- Dynamic sections from API -->
+          <div id="dynamicSections"></div>
         </div>
         <div class="modal-foot">
           <button type="button" class="btn btn-dark" onclick="closeModal()">Annuleren</button>
-          <button type="submit" class="btn btn-red" id="agent0Btn">
-            🚀&ensp;Brand Manual Genereren
-          </button>
+          <button type="submit" class="btn btn-red" id="agent0Btn">🚀&ensp;Brand Manual Genereren</button>
         </div>
       </form>
     </div>
 
     <!-- STATE: Processing -->
     <div id="ms-processing" hidden>
-      <div class="state-processing">
-        <div class="proc-header">
+      <div class="ms-proc-inner">
+        <div class="proc-hdr">
           <div class="spinner"></div>
           <div>
-            <div class="proc-title">Brand Manual wordt aangemaakt…</div>
-            <div class="proc-sub">Dit kan 1–3 minuten duren. Voortgang in de terminal hieronder.</div>
+            <div class="proc-title">Agent 0 draait — Brand Manual wordt aangemaakt</div>
+            <div class="proc-sub">Live output hieronder. Dit duurt 1–3 minuten.</div>
           </div>
         </div>
         <div class="mini-term" id="miniTerm">
-          <div class="mini-empty">Wachten op Agent 0 output…</div>
+          <div class="mini-empty-txt">Wachten op Agent 0 output…</div>
         </div>
       </div>
     </div>
 
     <!-- STATE: Done -->
     <div id="ms-done" hidden>
-      <div class="state-done">
+      <div class="ms-done-inner">
         <div class="done-ico">✓</div>
         <div class="done-title">Brand Manual Gegenereerd!</div>
-        <div class="done-sub" id="doneProductName"></div>
-        <div class="done-sub">Je kunt nu de volledige pipeline starten voor dit product.</div>
+        <div class="done-sub" id="doneNaam"></div>
+        <div class="done-sub">Agent 0 is klaar. Je kunt nu de pipeline starten voor de volgende stappen (Agent 2 t/m 5).</div>
       </div>
       <div class="modal-foot">
         <button class="btn btn-dark" onclick="closeModal()">Sluiten</button>
-        <button class="btn btn-red" onclick="startPipelineFromModal()">
-          ▶&ensp;Pipeline Starten voor dit Product
-        </button>
+        <button class="btn btn-red" onclick="startPipelineFromModal()">▶&ensp;Pipeline Starten (Agent 2–5)</button>
       </div>
     </div>
 
     <!-- STATE: Error -->
     <div id="ms-error" hidden>
-      <div class="state-error">
+      <div class="ms-err-inner">
         <div class="err-ico">⚠️</div>
-        <div class="err-title">Er ging iets mis</div>
-        <div class="err-msg" id="errMsg">Onbekende fout</div>
+        <div class="err-title">Er is iets misgegaan</div>
+        <div class="err-sub" id="errMsg">Onbekende fout.</div>
       </div>
       <div class="modal-foot">
         <button class="btn btn-dark" onclick="closeModal()">Sluiten</button>
-        <button class="btn btn-red" onclick="retryModal()">Opnieuw proberen</button>
+        <button class="btn btn-red" onclick="openModal()">Opnieuw proberen</button>
       </div>
     </div>
 
@@ -567,9 +441,12 @@ header {
 <div id="toasts"></div>
 
 <script>
+'use strict';
 const API = 'http://162.55.215.56:8000';
 
-// ─── Agent definitions ────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   AGENT DEFINITIONS
+───────────────────────────────────────────────────────── */
 const AGENTS = [
   { id: 0, icon: '🎤', name: 'Brand Interview',  desc: 'Eenmalig per product' },
   { id: 1, icon: '🔍', name: 'Market Research',  desc: 'Eenmalig, gecached' },
@@ -579,28 +456,33 @@ const AGENTS = [
   { id: 5, icon: '📊', name: 'Performance',       desc: 'Feedback loop na 24u' },
 ];
 
-// ─── Global state ─────────────────────────────────────────────────────
-let agentStates    = ['wait','wait','wait','wait','wait','wait'];
-let seenLogs       = new Set();
-let pipeRunning    = false;
-let autoScroll     = true;
+/* ─────────────────────────────────────────────────────────
+   GLOBAL STATE
+───────────────────────────────────────────────────────── */
+let agentStates     = ['wait','wait','wait','wait','wait','wait'];
+let seenLogs        = new Set();
+let pipeRunning     = false;
+let autoScroll      = true;
 
-// Modal state
-let newProductId       = null;
-let miniSeenLogs       = new Set();
-let procPollInterval   = null;  // polling logs during processing
-let completionInterval = null;  // polling for agent0 done
-let procStartTime      = null;
-const PROC_TIMEOUT_MS  = 6 * 60 * 1000; // 6 minutes
+// Modal / Agent0 state
+let newProductId        = null;   // set after agent0 completes
+let parsedSections      = [];     // [{naam, vragen:[{id,vraag,type,...}]}]
+let miniSeenLogs        = new Set();
+let miniPollTimer       = null;   // interval: poll /logs during processing
+let completionTimer     = null;   // interval: poll /agent0/status
+let procStartTime       = null;
+const PROC_TIMEOUT      = 7 * 60 * 1000; // 7 min
 
-// ─── Render agents ────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   RENDER AGENTS
+───────────────────────────────────────────────────────── */
 function renderAgents() {
   const el = document.getElementById('agentFlow');
   el.innerHTML = '';
   AGENTS.forEach((a, i) => {
     const st = agentStates[i];
-    const cc = { wait:'chip-wait', running:'chip-run', done:'chip-done', error:'chip-error' }[st] || 'chip-wait';
-    const cl = { wait:'Wacht',     running:'Draait',   done:'Klaar',    error:'Fout' }[st]    || st;
+    const cc = {wait:'chip-wait',running:'chip-run',done:'chip-done',error:'chip-error'}[st]||'chip-wait';
+    const cl = {wait:'Wacht',running:'Draait',done:'Klaar',error:'Fout'}[st]||st;
     const card = document.createElement('div');
     card.className = `agent-card ${st}`;
     card.innerHTML = `
@@ -609,7 +491,7 @@ function renderAgents() {
           <span class="agent-icon">${a.icon}</span>
           <span>Agent ${a.id} — ${a.name}</span>
         </div>
-        <span class="status-chip ${cc}"><span class="chip-dot"></span>${cl}</span>
+        <span class="chip ${cc}"><span class="chip-dot"></span>${cl}</span>
       </div>
       <div class="agent-desc">${a.desc}</div>`;
     el.appendChild(card);
@@ -628,50 +510,68 @@ function setAgentState(idx, st) {
   renderAgents();
 }
 
-// ─── Log helpers ──────────────────────────────────────────────────────
-function logMessage(raw)   { return typeof raw === 'string' ? raw : raw?.message || raw?.msg || raw?.text || JSON.stringify(raw); }
-function logTimestamp(raw) {
-  const ts = typeof raw === 'object' ? raw?.timestamp || raw?.time || raw?.ts : null;
-  if (ts) { const d = new Date(ts); if (!isNaN(d)) return d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
-  return new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+/* ─────────────────────────────────────────────────────────
+   LOG UTILITIES
+───────────────────────────────────────────────────────── */
+// api.py stuurt: { tijd, tekst, type }  (type = gold|green|red|amber|dim)
+function logMsg(raw)  {
+  if (typeof raw === 'string') return raw;
+  return raw?.tekst || raw?.message || raw?.msg || raw?.text || JSON.stringify(raw);
 }
 function logKey(raw) {
   return typeof raw === 'object'
-    ? `${raw.id||''}|${raw.timestamp||''}|${logMessage(raw)}`
+    ? `${raw.id||''}|${raw.tijd||raw.timestamp||''}|${logMsg(raw)}`
     : String(raw);
 }
-function classifyLog(raw) {
-  const msg = logMessage(raw).toLowerCase();
-  const lvl = (typeof raw === 'object' ? raw?.level || raw?.type || '' : '').toLowerCase();
-  if (lvl==='error'   || /\b(error|fout|failed|exception|traceback)\b/.test(msg)) return 'lt-err';
-  if (lvl==='success' || /\b(success|geslaagd|voltooid|done|completed)\b/.test(msg)) return 'lt-ok';
-  if (/\bpipeline\b/.test(msg)) return 'lt-pipe';
-  if (lvl==='agent'   || /\b(agent|brand interview|market research|script maker|video generator|publisher|performance)\b/.test(msg)) return 'lt-agent';
+function logTs(raw) {
+  if (typeof raw === 'object') {
+    // api.py geeft 'tijd' als "HH:MM:SS" string — direct gebruiken
+    if (raw.tijd) return raw.tijd;
+    const ts = raw.timestamp || raw.time || raw.ts;
+    if (ts) { const d = new Date(ts); if (!isNaN(d)) return d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+  }
+  return new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function classify(raw) {
+  const m = logMsg(raw).toLowerCase();
+  // api.py log types: gold | green | red | amber | dim
+  const t = (typeof raw==='object' ? raw?.type||raw?.level||'' : '').toLowerCase();
+  if (t==='red'    || t==='error'   || /\b(error|fout|failed|exception|traceback)\b/.test(m)) return 'lt-err';
+  if (t==='green'  || t==='success' || /\b(success|geslaagd|voltooid|done|completed)\b/.test(m)) return 'lt-ok';
+  if (t==='gold'   || t==='pipeline'|| /\bpipeline\b/.test(m)) return 'lt-pipe';
+  if (t==='amber'  || t==='agent'   || /\b(agent|brand interview|market research|script maker|video|publisher|performance)\b/.test(m)) return 'lt-agent';
   return 'lt-info';
 }
-function tagLabel(cls) { return {'lt-pipe':'PIPE','lt-ok':'OK','lt-err':'ERR','lt-agent':'AGENT','lt-info':'INFO'}[cls]||'LOG'; }
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function tagOf(cls) { return {'lt-pipe':'PIPE','lt-ok':'OK','lt-err':'ERR','lt-agent':'AGENT','lt-info':'INFO'}[cls]||'LOG'; }
+function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-// ─── Main terminal ────────────────────────────────────────────────────
-function appendLogEntry(raw) {
+/* ─────────────────────────────────────────────────────────
+   MAIN TERMINAL
+───────────────────────────────────────────────────────── */
+function appendLog(raw) {
   const term  = document.getElementById('terminal');
   const empty = term.querySelector('.term-empty');
   if (empty) empty.remove();
-  const cls = classifyLog(raw);
+  const cls = classify(raw);
   const row = document.createElement('div');
   row.className = `log-row ${cls}`;
-  row.innerHTML = `<span class="log-ts">${logTimestamp(raw)}</span><span class="log-tag">${tagLabel(cls)}</span><span class="log-txt">${esc(logMessage(raw))}</span>`;
+  row.innerHTML = `<span class="log-ts">${logTs(raw)}</span><span class="log-tag">${tagOf(cls)}</span><span class="log-txt">${esc(logMsg(raw))}</span>`;
   term.appendChild(row);
-  detectAgentFromLog(logMessage(raw).toLowerCase());
+  detectAgent(logMsg(raw).toLowerCase());
   if (autoScroll) term.scrollTop = term.scrollHeight;
 }
 
-function detectAgentFromLog(msg) {
+// Inject a synthetic dashboard log message
+function sysLog(message, type='pipeline') {
+  appendLog({ message, timestamp: new Date().toISOString(), level: type });
+}
+
+function detectAgent(m) {
   AGENTS.forEach((a, i) => {
-    if (!msg.includes(a.name.toLowerCase()) && !msg.includes(`agent ${a.id}`)) return;
-    if (/start|bezig|running|draait/.test(msg))                  setAgentState(i,'running');
-    else if (/klaar|done|success|voltooid|completed/.test(msg))  setAgentState(i,'done');
-    else if (/error|fout|failed/.test(msg))                      setAgentState(i,'error');
+    if (!m.includes(a.name.toLowerCase()) && !m.includes(`agent ${a.id}`)) return;
+    if (/start|bezig|running|draait/.test(m))                 setAgentState(i,'running');
+    else if (/klaar|done|success|voltooid|completed/.test(m)) setAgentState(i,'done');
+    else if (/error|fout|failed/.test(m))                     setAgentState(i,'error');
   });
 }
 
@@ -681,25 +581,29 @@ function clearLogs() {
   toast('Logs gewist','info');
 }
 
-// ─── Fetch: logs (main terminal) ──────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   FETCH: LOGS (main terminal, every 3 s)
+───────────────────────────────────────────────────────── */
 async function fetchLogs() {
   try {
-    const res = await fetch(`${API}/logs`,{signal:AbortSignal.timeout(5000)});
-    if (!res.ok) throw new Error();
+    const res = await fetch(`${API}/logs`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) return;
     const data = await res.json();
     const logs = Array.isArray(data) ? data : data?.logs||data?.data||data?.items||[];
     for (const log of logs) {
       const k = logKey(log);
-      if (!seenLogs.has(k)) { seenLogs.add(k); appendLogEntry(log); }
+      if (!seenLogs.has(k)) { seenLogs.add(k); appendLog(log); }
     }
     setConn('ok');
   } catch (_) {}
 }
 
-// ─── Fetch: products ──────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   FETCH: PRODUCTS (every 5 s)
+───────────────────────────────────────────────────────── */
 async function fetchProducts() {
   try {
-    const res = await fetch(`${API}/producten`,{signal:AbortSignal.timeout(5000)});
+    const res = await fetch(`${API}/producten`, { signal: AbortSignal.timeout(5000) });
     if (!res.ok) throw new Error();
     const data = await res.json();
     const list = Array.isArray(data) ? data : data?.producten||data?.products||data?.data||data?.items||[];
@@ -711,27 +615,26 @@ async function fetchProducts() {
   }
 }
 
-// ─── Product status helpers ────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   PRODUCT STATUS HELPERS
+───────────────────────────────────────────────────────── */
 function hasBrandManual(p) {
   const s = (p.status||p.stap||'').toLowerCase();
   return !!(
     p.heeft_brand_manual || p.brand_manual || p.brand_manual_klaar ||
-    p.agent0_klaar       || p.agent_0_klaar ||
-    (p.agent_status && ['done','klaar','completed'].includes((p.agent_status.agent0||'').toLowerCase())) ||
-    ['research','script','video','publisher','performance','active','actief','klaar'].some(v => s.includes(v))
+    p.agent0_klaar || p.agent_0_klaar ||
+    (p.agent_status?.agent0 && ['done','klaar','completed'].includes(p.agent_status.agent0.toLowerCase())) ||
+    ['research','script','video','publisher','performance','active','actief'].some(v => s.includes(v))
   );
 }
-
 function hasResearch(p) {
   const s = (p.status||p.stap||'').toLowerCase();
   return !!(
-    p.heeft_research || p.research_gedaan || p.research_klaar ||
-    p.agent2_klaar   || p.agent_2_klaar   ||
-    (p.agent_status && ['done','klaar','completed'].includes((p.agent_status.agent2||'').toLowerCase())) ||
+    p.heeft_research || p.research_gedaan || p.agent2_klaar ||
+    (p.agent_status?.agent2 && ['done','klaar','completed'].includes(p.agent_status.agent2.toLowerCase())) ||
     ['script','video','publisher','performance','active','actief'].some(v => s.includes(v))
   );
 }
-
 function prodBadge(s) {
   if (['active','actief','done','klaar','completed'].includes(s)) return ['pb-active','Actief'];
   if (['running','draait','bezig'].includes(s))                    return ['pb-running','Draait'];
@@ -740,374 +643,492 @@ function prodBadge(s) {
   return ['pb-idle','Inactief'];
 }
 
-// ─── Render products ──────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   RENDER PRODUCTS
+───────────────────────────────────────────────────────── */
 function renderProducts(list) {
   const el = document.getElementById('productList');
-  if (!list || list.length === 0) {
+  if (!list || !list.length) {
     el.innerHTML = '<div class="empty-state"><div class="empty-ico">📦</div><div class="empty-txt">Geen producten gevonden.<br>Voeg een product toe om te beginnen.</div></div>';
     return;
   }
-
   el.innerHTML = list.map(p => {
-    const name      = p.naam || p.name || p.title || p.product_naam || 'Onbekend';
-    const id        = p.id   || p.product_id || p._id || '—';
-    const status    = (p.status||'idle').toLowerCase();
-    const [bClass, bLabel] = prodBadge(status);
-    const manual    = hasBrandManual(p);
-    const research  = hasResearch(p);
-    const safeId    = esc(String(id));
-    const safeName  = esc(String(name));
+    const name   = esc(String(p.naam||p.name||p.title||p.product_naam||'Onbekend'));
+    const id     = esc(String(p.id||p.product_id||p._id||'—'));
+    const [bc,bl]= prodBadge((p.status||'idle').toLowerCase());
+    const manual = hasBrandManual(p);
+    const research = hasResearch(p);
 
-    // Build step indicators
-    const step0 = manual
+    const s0 = manual
       ? `<span class="prod-step step-done">✓ Brand Manual</span>`
       : `<span class="prod-step step-next">○ Brand Manual</span>`;
-    const step1 = research
+    const s1 = research
       ? `<span class="prod-step step-done">✓ Market Research</span>`
       : manual
         ? `<span class="prod-step step-next">○ Market Research</span>`
         : `<span class="prod-step step-pending">○ Market Research</span>`;
 
-    // Next step hint
-    let nextHint = '';
-    if (!manual)   nextHint = `<div class="prod-next-hint">Brand Manual genereren vereist</div>`;
-    else if (!research) nextHint = `<div class="prod-next-hint">Research klaar na pipeline start</div>`;
+    const hint = !manual
+      ? `<div class="prod-hint">Genereer eerst een Brand Manual via Agent 0</div>`
+      : !research
+        ? `<div class="prod-hint">Start de pipeline — Market Research volgt automatisch</div>`
+        : '';
 
-    // Action buttons
-    let actions = '';
-    if (manual) {
-      actions = `<button class="btn btn-green" onclick="pipelineStart('${safeId}','${safeName}')">▶&ensp;Pipeline Starten</button>`;
-    } else {
-      actions = `<button class="btn btn-amber" onclick="openModalForProduct('${safeId}','${safeName}')">🎤&ensp;Brand Manual Maken</button>`;
-    }
+    const actions = manual
+      ? `<button class="btn btn-green" onclick="pipelineStart('${id}','${name}')">▶&ensp;Pipeline Starten</button>`
+      : `<button class="btn btn-amber" onclick="openModal('${id}','${name}')">🎤&ensp;Brand Manual Maken</button>`;
 
     return `
-      <div class="prod-card ${manual ? 'has-manual' : ''}">
+      <div class="prod-card ${manual?'has-manual':''}">
         <div class="prod-top">
-          <div>
-            <div class="prod-name">${safeName}</div>
-            <div class="prod-id">ID: ${safeId}</div>
-          </div>
-          <span class="prod-badge ${bClass}">${bLabel}</span>
+          <div><div class="prod-name">${name}</div><div class="prod-id">ID: ${id}</div></div>
+          <span class="prod-badge ${bc}">${bl}</span>
         </div>
-        <div class="prod-steps">${step0}${step1}</div>
-        ${nextHint}
+        <div class="prod-steps">${s0}${s1}</div>
+        ${hint}
         <div class="prod-actions">${actions}</div>
       </div>`;
   }).join('');
 }
 
-// ─── Fetch: pipeline status ────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   FETCH: PIPELINE STATUS (every 5 s)
+───────────────────────────────────────────────────────── */
 async function fetchStatus() {
-  for (const ep of ['/status','/pipeline/status']) {
-    try {
-      const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(4000)});
-      if (!res.ok) continue;
-      const data = await res.json();
-      const running = !!(data.running||data.is_running||data.active);
-      const lastRun = data.last_run||data.lastRun||data.timestamp||null;
-      pipeRunning = running;
-      updatePipeBar(running, lastRun);
-      const agents = data.agents||data.agent_statuses||[];
-      agents.forEach((a,i) => {
-        if (i>=AGENTS.length) return;
-        const s = (a.status||a.state||'wait').toLowerCase();
-        agentStates[i] = s==='running'||s==='active'||s==='draait' ? 'running'
-          : s==='done'||s==='klaar'||s==='completed' ? 'done'
-          : s==='error'||s==='fout'||s==='failed' ? 'error' : 'wait';
-      });
-      if (agents.length) renderAgents();
-      setConn(running ? 'run' : 'ok');
-      return;
-    } catch (_) {}
-  }
+  try {
+    const res = await fetch(`${API}/status`, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return;
+    const d = await res.json();
+
+    // api.py gebruikt 'draait' (NL) in plaats van 'running'
+    pipeRunning = !!(d.draait || d.running || d.is_running || d.active);
+    const lastRun = d.laatste_run || d.last_run || d.lastRun || null;
+    updatePipeBar(pipeRunning, lastRun);
+
+    // Huidige agent bijwerken op basis van 'huidige_agent' (enkel getal)
+    const huidig = d.huidige_agent ?? d.current_agent ?? null;
+    if (huidig !== null && huidig >= 0 && huidig < AGENTS.length) {
+      if (pipeRunning) setAgentState(huidig, 'running');
+    } else if (!pipeRunning) {
+      // Pipeline gestopt — running agents terug naar wait
+      agentStates = agentStates.map(s => s === 'running' ? 'wait' : s);
+      renderAgents();
+    }
+
+    setConn(pipeRunning ? 'run' : 'ok');
+  } catch (_) {}
 }
 
 function updatePipeBar(running, lastRun) {
-  document.getElementById('pipeDot').className     = `conn-dot ${running ? 'run' : 'ok'}`;
-  document.getElementById('pipeLabelTxt').textContent = running ? 'Pipeline draait' : 'Gestopt';
+  document.getElementById('pipeDot').className = `dot ${running?'run':'ok'}`;
+  document.getElementById('pipeTxt').textContent = running ? 'Pipeline draait' : 'Gestopt';
   if (lastRun) {
     const d = new Date(lastRun);
     document.getElementById('pipeLastRun').textContent = `Laatste run: ${isNaN(d) ? lastRun : d.toLocaleString('nl-NL')}`;
   }
 }
 
-// ─── Pipeline actions ──────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   PIPELINE ACTIONS
+───────────────────────────────────────────────────────── */
 async function pipelineStart(productId, productName) {
   const btn = document.getElementById('btnStart');
   btn.disabled = true; btn.textContent = '▶ Starten…';
   try {
     const body = productId ? { product_id: productId } : {};
-    const res = await fetch(`${API}/pipeline/starten`,{
+    const res = await fetch(`${API}/pipeline/starten`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       body: JSON.stringify(body), signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     toast(productName ? `Pipeline gestart voor ${productName}!` : 'Pipeline gestart!', 'ok');
+    sysLog(`Pipeline gestart${productName ? ' voor '+productName : ''} → Agent 2 t/m 5`,'pipeline');
     pipeRunning = true;
     updatePipeBar(true, new Date().toISOString());
-    agentStates = ['running','wait','wait','wait','wait','wait'];
+    // Agent 0 stays done, agents 1-5 go to running/wait
+    agentStates[0] = 'done';
+    agentStates[1] = 'running';
+    for (let i=2;i<6;i++) agentStates[i]='wait';
     renderAgents();
-  } catch (e) { toast(`Fout bij starten: ${e.message}`,'err'); }
-  finally { btn.disabled=false; btn.innerHTML='▶&ensp;Pipeline Starten'; }
+  } catch (e) {
+    toast(`Fout bij starten: ${e.message}`,'err');
+    sysLog(`Fout bij pipeline starten: ${e.message}`,'error');
+  } finally {
+    btn.disabled=false; btn.innerHTML='▶&ensp;Pipeline Starten';
+  }
 }
 
 async function pipelineStop() {
   const btn = document.getElementById('btnStop');
   btn.disabled=true; btn.textContent='⬛ Stoppen…';
   try {
-    const res = await fetch(`${API}/pipeline/stoppen`,{
+    const res = await fetch(`${API}/pipeline/stoppen`, {
       method:'POST', headers:{'Content-Type':'application/json'},
       signal: AbortSignal.timeout(10000),
     });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     toast('Pipeline gestopt.','info');
-    pipeRunning = false;
-    updatePipeBar(false, null);
-    agentStates = ['wait','wait','wait','wait','wait','wait'];
+    sysLog('Pipeline gestopt door gebruiker','pipeline');
+    pipeRunning=false; updatePipeBar(false,null);
+    agentStates=agentStates.map(s=>s==='running'?'wait':s);
     renderAgents();
-  } catch (e) { toast(`Fout bij stoppen: ${e.message}`,'err'); }
-  finally { btn.disabled=false; btn.innerHTML='⬛&ensp;Pipeline Stoppen'; }
+  } catch (e) {
+    toast(`Fout bij stoppen: ${e.message}`,'err');
+  } finally {
+    btn.disabled=false; btn.innerHTML='⬛&ensp;Pipeline Stoppen';
+  }
 }
 
-// ─── MODAL: Wizard states ─────────────────────────────────────────────
-const MODAL_STATES = ['loading','form','processing','done','error'];
+/* ─────────────────────────────────────────────────────────
+   MODAL — WIZARD STATE MANAGEMENT
+───────────────────────────────────────────────────────── */
+const MS = ['loading','form','processing','done','error'];
 
-function setModalState(state) {
-  MODAL_STATES.forEach(s => {
-    const el = document.getElementById(`ms-${s}`);
-    if (el) el.hidden = (s !== state);
-  });
-  // Update wizard bar
-  const step = { loading:0, form:0, processing:1, done:2, error:2 }[state] ?? 0;
-  ['wz0','wz1','wz2'].forEach((id, i) => {
+function setWizardState(state) {
+  MS.forEach(s => { const el=document.getElementById(`ms-${s}`); if(el) el.hidden=(s!==state); });
+  // Wizard bar
+  const stepIdx = {loading:0,form:0,processing:1,done:2,error:2}[state]??0;
+  ['wz0','wz1','wz2'].forEach((id,i) => {
     const el = document.getElementById(id);
     if (!el) return;
-    el.className = 'wz-step' + (i < step ? ' done' : i === step ? ' active' : '');
-    el.querySelector('.wz-num').textContent = i < step ? '✓' : i + 1;
+    el.className = 'wiz-step' + (i<stepIdx?' done':i===stepIdx?' active':'');
+    el.querySelector('.wiz-num').textContent = i<stepIdx ? '✓' : i+1;
   });
 }
 
-// ─── Modal open / close ───────────────────────────────────────────────
-async function openModal(prefillId = null, prefillName = null) {
-  newProductId = prefillId;
+/* ─────────────────────────────────────────────────────────
+   MODAL — OPEN / CLOSE
+───────────────────────────────────────────────────────── */
+async function openModal(prefillId=null, prefillName=null) {
+  newProductId = prefillId || null;
   miniSeenLogs.clear();
+  clearMiniTerm();
   document.getElementById('overlay').classList.add('open');
-  document.getElementById('modalTitle').innerHTML =
-    prefillName ? `Brand Manual voor <em>${esc(prefillName)}</em>` : 'Nieuw Product <em>Toevoegen</em>';
+  document.getElementById('modalTitle').innerHTML = prefillName
+    ? `Brand Manual voor <em>${esc(prefillName)}</em>`
+    : 'Nieuw Product <em>Toevoegen</em>';
+  document.getElementById('dynamicSections').innerHTML = '';
+  document.getElementById('fp-url').value  = '';
+  document.getElementById('fp-land').value = 'Nederland';
+  document.getElementById('fp-taal').value = 'Nederlands';
 
-  setModalState('loading');
+  setWizardState('loading');
+  sysLog('Bezig met laden van interview vragen via /agent0/vragen…','pipeline');
 
   try {
-    const res = await fetch(`${API}/agent0/vragen`,{signal:AbortSignal.timeout(8000)});
+    const res = await fetch(`${API}/agent0/vragen`, { signal: AbortSignal.timeout(8000) });
     if (res.ok) {
       const data = await res.json();
-      buildQuestionForm(data, prefillId, prefillName);
+      sysLog('Interview vragen geladen ✓','success');
+      buildDynamicSections(data);
     } else {
-      buildFallbackForm();
+      sysLog(`/agent0/vragen → HTTP ${res.status}, standaard formulier geladen`,'agent');
+      buildFallbackSections();
     }
-  } catch (_) {
-    buildFallbackForm();
+  } catch (e) {
+    sysLog(`Kan vragen niet laden (${e.message}), standaard formulier geladen`,'agent');
+    buildFallbackSections();
   }
-  setModalState('form');
+  setWizardState('form');
 }
-
-function openModalForProduct(id, name) { openModal(id, name); }
 
 function closeModal() {
   document.getElementById('overlay').classList.remove('open');
-  stopProcessingPolls();
+  stopProcessing();
 }
 
-function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+function overlayOutside(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
 
-function retryModal() { openModal(newProductId); }
-
-// ─── Build question form ──────────────────────────────────────────────
-function buildQuestionForm(data, prefillId, prefillName) {
-  // Normalize to array of sections
+/* ─────────────────────────────────────────────────────────
+   MODAL — BUILD DYNAMIC SECTIONS FROM API
+───────────────────────────────────────────────────────── */
+function buildDynamicSections(data) {
+  // Normalise to [{naam, vragen:[{id,vraag,type,...}]}]
   let sections = [];
-  if (data.secties || data.sections) {
-    sections = data.secties || data.sections;
-  } else if (Array.isArray(data)) {
-    // Flat list — group by sectie
-    const map = {};
-    data.forEach(v => {
-      const key = v.sectie || v.category || v.groep || 'Algemeen';
-      if (!map[key]) map[key] = [];
-      map[key].push(v);
-    });
-    sections = Object.entries(map).map(([naam, vragen]) => ({naam, vragen}));
-  } else if (data.vragen) {
-    sections = [{ naam: 'Vragen', vragen: data.vragen }];
-  } else {
-    buildFallbackForm(prefillId, prefillName); return;
-  }
-  if (!sections.length) { buildFallbackForm(prefillId, prefillName); return; }
 
-  document.getElementById('formSections').innerHTML = sections.map((s, si) => `
+  if (Array.isArray(data)) {
+    // Could be flat list of questions with sectie field, or list of section objects
+    if (data.length && data[0].vragen) {
+      sections = data; // already section objects
+    } else {
+      // Flat question list — group by sectie
+      const map = {};
+      data.forEach(v => {
+        const key = v.sectie || v.category || v.groep || 'Vragen';
+        if (!map[key]) map[key] = [];
+        map[key].push(v);
+      });
+      sections = Object.entries(map).map(([naam, vragen]) => ({naam, vragen}));
+    }
+  } else if (data.secties)  { sections = data.secties;  }
+  else if (data.sections)   { sections = data.sections; }
+  else if (data.vragen)     { sections = [{naam:'Vragen', vragen:data.vragen}]; }
+
+  if (!sections.length) { buildFallbackSections(); return; }
+
+  parsedSections = sections.map(s => ({
+    naam:  s.naam || s.name || s.titel || 'Sectie',
+    vragen: (s.vragen || s.questions || s.fields || []).map(v => ({
+      id:   v.id    || v.key     || v.vraag_id || null,
+      naam: v.naam  || v.name   || null,
+      vraag: v.vraag || v.label  || v.question || v.tekst || '',
+      type: (v.type || 'text').toLowerCase(),
+      placeholder: v.placeholder || v.voorbeeld || v.example || '',
+      required: !!(v.vereist || v.required || v.verplicht),
+      opties: v.opties || v.options || [],
+    })),
+  }));
+
+  renderFormSections();
+}
+
+function buildFallbackSections() {
+  parsedSections = [
+    {
+      naam: 'Merkfundament',
+      vragen: [
+        {id:'merk_naam',    naam:'merk_naam',    vraag:'Naam van het merk',       type:'text',     required:true,  placeholder:'bijv. NovaTech', opties:[]},
+        {id:'merk_omschr',  naam:'merk_omschr',  vraag:'Beschrijving van het merk',type:'textarea', required:false, placeholder:'Beschrijf het merk in 2-3 zinnen', opties:[]},
+        {id:'doelgroep',    naam:'doelgroep',    vraag:'Doelgroep',               type:'text',     required:false, placeholder:'bijv. Jonge professionals 25-35', opties:[]},
+        {id:'usp',          naam:'usp',          vraag:'Unieke verkoopargumenten', type:'textarea', required:false, placeholder:'Wat maakt dit product uniek?', opties:[]},
+      ]
+    },
+    {
+      naam: 'Product & Prijsstrategie',
+      vragen: [
+        {id:'product_naam', naam:'product_naam', vraag:'Productnaam',              type:'text',     required:true,  placeholder:'bijv. ProMax 3000', opties:[]},
+        {id:'prijs',        naam:'prijs',        vraag:'Prijs',                   type:'text',     required:false, placeholder:'bijv. €49,95', opties:[]},
+        {id:'concurrenten', naam:'concurrenten', vraag:'Belangrijkste concurrenten',type:'text',    required:false, placeholder:'bijv. Brand A, Brand B', opties:[]},
+      ]
+    },
+  ];
+  renderFormSections();
+}
+
+function renderFormSections() {
+  const container = document.getElementById('dynamicSections');
+  container.innerHTML = parsedSections.map((s, si) => `
     <div class="form-section">
-      <div class="form-section-title">${esc(s.naam || `Sectie ${si+1}`)}</div>
-      ${(s.vragen||[]).map((v, vi) => {
-        const fid  = `q_${si}_${vi}`;
-        const lbl  = v.vraag || v.naam || v.label || v.question || `Vraag ${vi+1}`;
-        const req  = v.vereist||v.required||v.verplicht ? 'required' : '';
-        const ph   = v.placeholder||v.voorbeeld||v.example||'';
+      <div class="fs-title">${esc(s.naam)}</div>
+      ${s.vragen.map((v, vi) => {
+        const fid = `dyn_${si}_${vi}`;
+        const req = v.required ? 'required' : '';
+        const lbl = esc(v.vraag || v.naam || `Vraag ${vi+1}`);
         return `<div class="fg">
-          <label class="flabel" for="${fid}">${esc(lbl)}${req ? ' *' : ''}</label>
-          ${buildInputField(v, fid, req, ph)}
+          <label class="flabel" for="${fid}">${lbl}${req ? ' *' : ''}</label>
+          ${renderInput(v, fid, req)}
         </div>`;
       }).join('')}
     </div>`).join('');
 }
 
-function buildFallbackForm(prefillId, prefillName) {
-  document.getElementById('formSections').innerHTML = `
-    <div class="form-section">
-      <div class="form-section-title">Product Informatie</div>
-      <div class="fg">
-        <label class="flabel" for="q_naam">Productnaam *</label>
-        <input class="finput" id="q_naam" type="text" required placeholder="bijv. Wireless Headphones Pro" value="${prefillName ? esc(prefillName) : ''}">
-      </div>
-      <div class="fg">
-        <label class="flabel" for="q_link">Product URL *</label>
-        <input class="finput" id="q_link" type="url" required placeholder="https://...">
-      </div>
-    </div>
-    <div class="form-section">
-      <div class="form-section-title">Doelgroep</div>
-      <div class="fg">
-        <label class="flabel" for="q_land">Doelland</label>
-        <input class="finput" id="q_land" type="text" value="Nederland">
-      </div>
-      <div class="fg">
-        <label class="flabel" for="q_taal">Doeltaal</label>
-        <input class="finput" id="q_taal" type="text" value="Nederlands">
-      </div>
-    </div>`;
-}
-
-function buildInputField(v, id, required, placeholder) {
-  const type = (v.type||'text').toLowerCase();
-  if (type==='textarea'||type==='tekst'||type==='text_long') {
-    return `<textarea class="finput finput-ta" id="${id}" ${required} rows="3" placeholder="${esc(placeholder)}"></textarea>`;
+function renderInput(v, fid, req) {
+  const ph = esc(v.placeholder || '');
+  const t  = v.type;
+  if (t === 'textarea' || t === 'text_long' || t === 'tekst') {
+    return `<textarea class="finput finput-ta" id="${fid}" ${req} rows="3" placeholder="${ph}"></textarea>`;
   }
-  if ((type==='select'||type==='keuze'||type==='dropdown') && (v.opties||v.options)) {
-    const opts = (v.opties||v.options).map(o => {
-      const val = typeof o==='object' ? (o.value||o.waarde||o.id||o) : o;
+  if ((t === 'select' || t === 'keuze' || t === 'dropdown') && v.opties.length) {
+    const opts = v.opties.map(o => {
+      const val = typeof o==='object' ? (o.value||o.id||o.waarde||o) : o;
       const lbl = typeof o==='object' ? (o.label||o.naam||o.text||val) : o;
       return `<option value="${esc(String(val))}">${esc(String(lbl))}</option>`;
     }).join('');
-    return `<select class="finput" id="${id}" ${required}><option value="">Kies een optie…</option>${opts}</select>`;
+    return `<select class="finput" id="${fid}" ${req}><option value="">— kies een optie —</option>${opts}</select>`;
   }
-  const ht = type==='number'||type==='nummer' ? 'number'
-           : type==='email'  ? 'email'
-           : type==='url'||type==='link' ? 'url' : 'text';
-  return `<input class="finput" id="${id}" type="${ht}" ${required} placeholder="${esc(placeholder)}">`;
+  const ht = t==='number'||t==='nummer' ? 'number' : t==='email' ? 'email' : t==='url'||t==='link' ? 'url' : 'text';
+  return `<input class="finput" id="${fid}" type="${ht}" ${req} placeholder="${ph}">`;
 }
 
-// ─── Submit Agent 0 ───────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   MODAL — COLLECT FORM DATA  →  correct body format
+   {
+     "doelland":    "...",
+     "doeltaal":    "...",
+     "product_url": "...",
+     "secties": {
+       "Merkfundament": { "vraag_id": "antwoord", ... },
+       ...
+     }
+   }
+───────────────────────────────────────────────────────── */
+function collectFormData() {
+  const product_url = document.getElementById('fp-url').value.trim();
+  const doelland    = document.getElementById('fp-land').value.trim() || 'Nederland';
+  const doeltaal    = document.getElementById('fp-taal').value.trim() || 'Nederlands';
+
+  const secties = {};
+  parsedSections.forEach((s, si) => {
+    const sectionData = {};
+    s.vragen.forEach((v, vi) => {
+      const el  = document.getElementById(`dyn_${si}_${vi}`);
+      if (!el) return;
+      // Use the question's id, then naam, then a generic key
+      const key = v.id || v.naam || v.vraag.replace(/\W+/g,'_').toLowerCase().slice(0,40) || `vraag_${vi+1}`;
+      sectionData[key] = el.type === 'checkbox' ? el.checked : el.value.trim();
+    });
+    secties[s.naam] = sectionData;
+  });
+
+  return { doelland, doeltaal, product_url, secties };
+}
+
+/* ─────────────────────────────────────────────────────────
+   MODAL — SUBMIT AGENT 0
+───────────────────────────────────────────────────────── */
 async function submitAgent0(e) {
   e.preventDefault();
 
-  // Collect all answers from form
-  const antwoorden = {};
-  document.getElementById('agentForm').querySelectorAll('input,textarea,select').forEach(el => {
-    if (!el.id) return;
-    const key = el.id; // keep full id as key, API can sort it out
-    antwoorden[key] = el.type === 'checkbox' ? el.checked : el.value.trim();
-  });
+  const payload = collectFormData();
 
-  // If product id is known, include it
-  const payload = { antwoorden };
-  if (newProductId) payload.product_id = newProductId;
+  // Validate URL
+  if (!payload.product_url) {
+    toast('Vul een product URL in','err'); return;
+  }
 
-  setModalState('processing');
+  setWizardState('processing');
   clearMiniTerm();
-  startMiniPoll();
+  setAgentState(0, 'running');
+
+  sysLog('━━━ Agent 0 gestart: Brand Interview ━━━','pipeline');
+  sysLog(`Product URL: ${payload.product_url}`,'agent');
+  sysLog(`Doelland: ${payload.doelland} | Doeltaal: ${payload.doeltaal}`,'agent');
+  sysLog('Antwoorden verstuurd naar POST /agent0/uitvoeren…','pipeline');
+
+  addMiniLine(`Versturen naar /agent0/uitvoeren…`,'dim');
+  addMiniLine(`product_url: ${payload.product_url}`,'dim');
+
   procStartTime = Date.now();
+  startMiniPoll();
 
   try {
     const res = await fetch(`${API}/agent0/uitvoeren`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(60000), // 60s to get initial response
+      signal: AbortSignal.timeout(90_000), // 90 s to get initial response
     });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const resp = await res.json();
 
-    newProductId = resp.product_id || resp.id || newProductId;
+    if (!res.ok) {
+      const errTxt = await res.text().catch(() => '');
+      throw new Error(`HTTP ${res.status}${errTxt ? ': '+errTxt : ''}`);
+    }
+
+    const resp = await res.json();
+    newProductId = resp.product_id || resp.id || null;
     const status = (resp.status || resp.state || '').toLowerCase();
 
-    if (['klaar','done','completed','success'].includes(status)) {
-      finishProcessing(resp);
-    } else {
-      // Still running — poll for completion
-      pollForCompletion(resp.job_id || resp.taak_id || null);
-    }
+    sysLog(`Agent 0 response: status="${status}" product_id="${newProductId||'?'}"`, 'agent');
+
+    // api.py start agent0 als background task en retourneert direct
+    // Completion wordt gedetecteerd via de log-monitor (fetchMiniLogs)
+    sysLog('Agent 0 draait als achtergrondtaak — live logs hieronder…', 'pipeline');
   } catch (err) {
-    stopProcessingPolls();
-    showModalError(err.message || 'Verbinding mislukt');
+    stopProcessing();
+    const msg = err.message || 'Onbekende fout';
+    sysLog(`Agent 0 FOUT: ${msg}`, 'error');
+    setAgentState(0, 'error');
+    document.getElementById('errMsg').textContent = msg;
+    setWizardState('error');
   }
 }
 
-// ─── Mini terminal (processing state) ────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   MODAL — MINI TERMINAL
+───────────────────────────────────────────────────────── */
 function clearMiniTerm() {
   miniSeenLogs.clear();
-  document.getElementById('miniTerm').innerHTML = '<div class="mini-empty">Wachten op Agent 0 output…</div>';
+  document.getElementById('miniTerm').innerHTML = '<div class="mini-empty-txt">Wachten op Agent 0 output…</div>';
 }
 
-function addMiniLog(raw) {
+function addMiniLine(text, cls='') {
   const term  = document.getElementById('miniTerm');
-  const empty = term.querySelector('.mini-empty');
+  const empty = term.querySelector('.mini-empty-txt');
   if (empty) empty.remove();
-  const msg = logMessage(raw);
-  const cls = classifyLog(raw);
-  const lineClass = cls==='lt-ok'?'log-ok':cls==='lt-err'?'log-err':cls==='lt-agent'?'log-ag':'';
+  const now = new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const div = document.createElement('div');
-  div.className = `mini-log-line ${lineClass}`;
-  div.textContent = `${logTimestamp(raw)}  ${msg}`;
+  div.className = `mini-line ${cls}`;
+  div.textContent = `${now}  ${text}`;
   term.appendChild(div);
   term.scrollTop = term.scrollHeight;
 }
 
-function isAgent0Log(msg) {
-  return /agent.?0|agent 0|brand.interview|brand.manual|interview|manual/.test(msg);
+function miniLineFromLog(raw) {
+  const m = logMsg(raw);
+  const c = classify(raw);
+  const cls = c==='lt-ok'?'ok':c==='lt-err'?'err':c==='lt-agent'?'ag':'dim';
+  addMiniLine(m, cls);
 }
 
-// ─── Polling: mini logs during processing ─────────────────────────────
+function isAgent0Related(m) {
+  return /agent.?0|agent 0|brand.?interview|brand.?manual|interview|manual/.test(m.toLowerCase());
+}
+
+/* ─────────────────────────────────────────────────────────
+   MINI POLL — live logs during processing
+───────────────────────────────────────────────────────── */
 function startMiniPoll() {
-  procPollInterval = setInterval(fetchMiniLogs, 2000);
+  miniPollTimer = setInterval(fetchMiniLogs, 2000);
 }
 
 async function fetchMiniLogs() {
   try {
-    const res = await fetch(`${API}/logs`,{signal:AbortSignal.timeout(3000)});
+    const res = await fetch(`${API}/logs`, { signal: AbortSignal.timeout(3000) });
     if (!res.ok) return;
     const data = await res.json();
-    const logs = Array.isArray(data) ? data : data?.logs||[];
+    // api.py retourneert {"logs": [...]}
+    const logs = Array.isArray(data) ? data : data?.logs || [];
+
     for (const log of logs) {
       const k = logKey(log);
-      // Main terminal
-      if (!seenLogs.has(k)) { seenLogs.add(k); appendLogEntry(log); }
-      // Mini terminal (agent0 logs only)
+
+      // Hoofd-terminal
+      if (!seenLogs.has(k)) { seenLogs.add(k); appendLog(log); }
+
+      // Mini-terminal + completion detectie
       if (!miniSeenLogs.has(k)) {
         miniSeenLogs.add(k);
-        if (isAgent0Log(logMessage(log).toLowerCase())) addMiniLog(log);
+        const msg = logMsg(log);
+        const low = msg.toLowerCase();
+
+        if (isAgent0Related(low)) miniLineFromLog(log);
+
+        // Detecteer Agent 0 klaar (berichten uit run_agent0_taak in api.py)
+        if (
+          low.includes('brand manual klaar voor') ||
+          low.includes('agent 0 voltooid') ||
+          low.includes('brand manual succesvol')
+        ) {
+          const naamMatch = msg.match(/voor[:\s]+['"]?([^'"]+)['"]?/i);
+          finishAgent0({ product_naam: naamMatch?.[1] || '' });
+          return;
+        }
+
+        // Detecteer Agent 0 fout
+        if (isAgent0Related(low) && (low.includes('✗') || low.includes('fout:') || low.includes('mislukt'))) {
+          stopProcessing();
+          setAgentState(0, 'error');
+          document.getElementById('errMsg').textContent = msg;
+          setWizardState('error');
+          return;
+        }
       }
     }
   } catch (_) {}
 }
 
-// ─── Polling: agent0 completion ───────────────────────────────────────
-function pollForCompletion(jobId) {
-  completionInterval = setInterval(async () => {
-    // Timeout check
-    if (Date.now() - procStartTime > PROC_TIMEOUT_MS) {
-      stopProcessingPolls();
-      showModalError('Timeout: Brand manual genereren duurt te lang. Controleer de terminal voor meer info.');
+/* ─────────────────────────────────────────────────────────
+   COMPLETION POLL — /agent0/status every 3 s
+───────────────────────────────────────────────────────── */
+function pollAgent0Done(jobId) {
+  completionTimer = setInterval(async () => {
+    if (Date.now() - procStartTime > PROC_TIMEOUT) {
+      stopProcessing();
+      sysLog('Agent 0 timeout — controleer de logs','error');
+      setAgentState(0,'error');
+      document.getElementById('errMsg').textContent = 'Timeout: Agent 0 duurt te lang. Controleer de terminal voor details.';
+      setWizardState('error');
       return;
     }
 
@@ -1117,57 +1138,59 @@ function pollForCompletion(jobId) {
 
     for (const ep of endpoints) {
       try {
-        const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(3000)});
+        const res = await fetch(`${API}${ep}`, { signal: AbortSignal.timeout(3000) });
         if (!res.ok) continue;
-        const data = await res.json();
-        const s = (data.status||data.state||'').toLowerCase();
-        if (['klaar','done','completed','success'].includes(s)) {
-          newProductId = data.product_id || data.id || newProductId;
-          finishProcessing(data);
-          return;
+        const d = await res.json();
+        const s = (d.status||d.state||'').toLowerCase();
+        if (['klaar','done','completed','success','gereed'].includes(s)) {
+          newProductId = d.product_id || d.id || newProductId;
+          finishAgent0(d); return;
         }
-        if (['error','failed','fout'].includes(s)) {
-          showModalError(data.bericht || data.message || 'Agent 0 is mislukt');
-          return;
+        if (['error','failed','fout','mislukt'].includes(s)) {
+          const msg = d.bericht||d.message||d.error||'Agent 0 is mislukt';
+          stopProcessing(); sysLog(`Agent 0 FOUT: ${msg}`,'error');
+          setAgentState(0,'error');
+          document.getElementById('errMsg').textContent = msg;
+          setWizardState('error'); return;
         }
-        break; // Valid endpoint found, don't check others this round
+        break; // valid endpoint found
       } catch (_) {}
     }
   }, 3000);
 }
 
-function stopProcessingPolls() {
-  if (procPollInterval)   { clearInterval(procPollInterval);   procPollInterval   = null; }
-  if (completionInterval) { clearInterval(completionInterval); completionInterval = null; }
+function stopProcessing() {
+  if (miniPollTimer)    { clearInterval(miniPollTimer);    miniPollTimer    = null; }
+  if (completionTimer)  { clearInterval(completionTimer);  completionTimer  = null; }
 }
 
-function finishProcessing(data) {
-  stopProcessingPolls();
+function finishAgent0(data) {
+  stopProcessing();
   newProductId = data?.product_id || data?.id || newProductId;
-  const naam = data?.product_naam || data?.naam || data?.name || '';
-  document.getElementById('doneProductName').textContent = naam ? `Product: ${naam}` : '';
-  setModalState('done');
+  const naam   = data?.product_naam || data?.naam || data?.name || '';
+
+  sysLog('━━━ Agent 0 KLAAR: Brand Manual gegenereerd ✓ ━━━','success');
+  sysLog('Klik op "Pipeline Starten" in het venster om Agent 2 t/m 5 te starten','pipeline');
+
+  setAgentState(0, 'done');
+  document.getElementById('doneNaam').textContent = naam ? `Product: ${naam}` : '';
+  setWizardState('done');
   fetchProducts();
   toast('Brand Manual gegenereerd! 🎉','ok');
 }
 
-function showModalError(msg) {
-  stopProcessingPolls();
-  document.getElementById('errMsg').textContent = msg;
-  setModalState('error');
-}
-
-// ─── Start pipeline from modal (after brand manual done) ──────────────
 async function startPipelineFromModal() {
   closeModal();
   await pipelineStart(newProductId, null);
 }
 
-// ─── Connection status ─────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   CONNECTION STATUS
+───────────────────────────────────────────────────────── */
 function setConn(state) {
-  document.getElementById('connDot').className = `conn-dot ${state}`;
+  document.getElementById('connDot').className = `dot ${state}`;
   document.getElementById('connTxt').textContent =
-    state==='ok' ? 'Verbonden' : state==='run' ? 'Pipeline draait' : 'Geen verbinding';
+    state==='ok'?'Verbonden': state==='run'?'Pipeline draait':'Geen verbinding';
   document.getElementById('lastUpdated').textContent =
     new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
 }
@@ -1175,23 +1198,25 @@ function setConn(state) {
 async function checkConn() {
   for (const ep of ['/','/status','/producten','/logs']) {
     try {
-      const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(4000)});
-      if (res.ok) { setConn(pipeRunning?'run':'ok'); return; }
+      const r = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(4000)});
+      if (r.ok) { setConn(pipeRunning?'run':'ok'); return; }
     } catch (_) {}
   }
-  document.getElementById('connDot').className = 'conn-dot err';
-  document.getElementById('connTxt').textContent = 'Geen verbinding';
+  document.getElementById('connDot').className='dot err';
+  document.getElementById('connTxt').textContent='Geen verbinding';
 }
 
-// ─── Auto-scroll detection ─────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   AUTO-SCROLL DETECTION
+───────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
-  const term = document.getElementById('terminal');
-  term.addEventListener('scroll', () => {
-    autoScroll = term.scrollHeight - term.scrollTop - term.clientHeight < 60;
-  });
+  const t = document.getElementById('terminal');
+  t.addEventListener('scroll', () => { autoScroll = t.scrollHeight - t.scrollTop - t.clientHeight < 60; });
 });
 
-// ─── Toast ─────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   TOAST
+───────────────────────────────────────────────────────── */
 function toast(msg, type='info') {
   const c   = document.getElementById('toasts');
   const ico = {ok:'✓',err:'✕',info:'ℹ'}[type]||'•';
@@ -1200,13 +1225,12 @@ function toast(msg, type='info') {
   div.className = `toast ${cls}`;
   div.innerHTML = `<span class="toast-ico">${ico}</span><span>${esc(msg)}</span>`;
   c.appendChild(div);
-  setTimeout(() => {
-    div.style.opacity='0'; div.style.transform='translateX(110%)';
-    setTimeout(() => div.remove(), 320);
-  }, 3500);
+  setTimeout(() => { div.style.opacity='0'; div.style.transform='translateX(110%)'; setTimeout(()=>div.remove(),320); }, 3500);
 }
 
-// ─── Boot ──────────────────────────────────────────────────────────────
+/* ─────────────────────────────────────────────────────────
+   BOOT
+───────────────────────────────────────────────────────── */
 renderAgents();
 checkConn();
 fetchLogs();
