@@ -156,6 +156,19 @@ header {
 .empty-ico { font-size: 28px; margin-bottom: 8px; opacity: .5; }
 .empty-txt { font-size: 12px; line-height: 1.5; }
 
+/* ── MODAL SCROLL FIX ──
+   Structuur: modal (flex col) → ms-form (flex col, flex:1) →
+   form (flex col, flex:1) → modal-body (scroll) + modal-foot (sticky)
+*/
+#ms-form {
+  display: flex; flex-direction: column;
+  flex: 1; overflow: hidden; min-height: 0;
+}
+#ms-form > form {
+  display: flex; flex-direction: column;
+  flex: 1; overflow: hidden; min-height: 0;
+}
+
 /* ── MODAL ── */
 .overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,.86);
@@ -363,12 +376,16 @@ header {
     <div id="ms-form" hidden>
       <form id="agentForm" onsubmit="submitAgent0(event)">
         <div class="modal-body">
-          <!-- Fixed product info — always shown -->
+          <!-- Fixed product info — altijd bovenaan zichtbaar -->
           <div class="form-section" id="fixedSection">
             <div class="fs-title">Product Informatie</div>
             <div class="fg">
-              <label class="flabel" for="fp-url">Product URL *</label>
-              <input class="finput" id="fp-url" type="url" required placeholder="https://...">
+              <label class="flabel" for="fp-naam">Productnaam *</label>
+              <input class="finput" id="fp-naam" type="text" required placeholder="bijv. Wireless Headphones Pro">
+            </div>
+            <div class="fg">
+              <label class="flabel" for="fp-url">Productlink URL</label>
+              <input class="finput" id="fp-url" type="url" placeholder="https://...">
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
               <div class="fg">
@@ -808,6 +825,7 @@ async function openModal(prefillId=null, prefillName=null) {
     ? `Brand Manual voor <em>${esc(prefillName)}</em>`
     : 'Nieuw Product <em>Toevoegen</em>';
   document.getElementById('dynamicSections').innerHTML = '';
+  document.getElementById('fp-naam').value = prefillName || '';
   document.getElementById('fp-url').value  = '';
   document.getElementById('fp-land').value = 'Nederland';
   document.getElementById('fp-taal').value = 'Nederlands';
@@ -954,9 +972,10 @@ function renderInput(v, fid, req) {
    }
 ───────────────────────────────────────────────────────── */
 function collectFormData() {
-  const product_url = document.getElementById('fp-url').value.trim();
-  const doelland    = document.getElementById('fp-land').value.trim() || 'Nederland';
-  const doeltaal    = document.getElementById('fp-taal').value.trim() || 'Nederlands';
+  const product_naam = document.getElementById('fp-naam').value.trim();
+  const product_url  = document.getElementById('fp-url').value.trim();
+  const doelland     = document.getElementById('fp-land').value.trim() || 'Nederland';
+  const doeltaal     = document.getElementById('fp-taal').value.trim() || 'Nederlands';
 
   const secties = {};
   parsedSections.forEach((s, si) => {
@@ -971,7 +990,7 @@ function collectFormData() {
     secties[s.naam] = sectionData;
   });
 
-  return { doelland, doeltaal, product_url, secties };
+  return { product_naam, doelland, doeltaal, product_url, secties };
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -982,9 +1001,11 @@ async function submitAgent0(e) {
 
   const payload = collectFormData();
 
-  // Validate URL
-  if (!payload.product_url) {
-    toast('Vul een product URL in','err'); return;
+  // Valideer verplichte velden
+  if (!payload.product_naam) {
+    toast('Vul een productnaam in','err');
+    document.getElementById('fp-naam').focus();
+    return;
   }
 
   setWizardState('processing');
