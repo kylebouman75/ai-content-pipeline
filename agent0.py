@@ -172,6 +172,100 @@ SECTIES = [
 ]
 
 # ============================================================
+# API FUNCTIES — aangeroepen door api.py
+# ============================================================
+
+def get_interview_vragen():
+    """
+    Geeft alle interview secties en vragen terug als gestructureerde
+    JSON voor het dashboard. Aangeroepen via GET /agent0/vragen.
+    """
+    result = []
+    for sectie in SECTIES:
+        vragen_list = []
+        for i, vraag_tekst in enumerate(sectie["vragen"]):
+            vragen_list.append({
+                "id":          f"v{i + 1}",
+                "vraag":       vraag_tekst,
+                "type":        "textarea",
+                "vereist":     True,
+                "placeholder": "Geef een gedetailleerd antwoord…"
+            })
+        result.append({
+            "naam":   sectie["naam"],
+            "intro":  sectie["intro"],
+            "vragen": vragen_list
+        })
+    return result
+
+
+def run_via_api(antwoorden: dict) -> dict:
+    """
+    Voert Agent 0 volledig uit met antwoorden aangeleverd vanuit het
+    dashboard (niet-interactief). Aangeroepen via POST /agent0/uitvoeren.
+
+    Verwacht formaat van antwoorden:
+    {
+        "doelland":    "Nederland",
+        "doeltaal":    "Nederlands",
+        "product_url": "https://...",
+        "secties": {
+            "Merkfundament":           {"v1": "antwoord", ...},
+            "Product & Prijsstrategie": {"v1": "antwoord", ...},
+            ...
+        }
+    }
+    """
+    doelland    = antwoorden.get("doelland",    "Nederland")
+    doeltaal    = antwoorden.get("doeltaal",    "Nederlands")
+    product_url = antwoorden.get("product_url", "")
+
+    alle_antwoorden = {
+        "doelland":    doelland,
+        "doeltaal":    doeltaal,
+        "product_url": product_url,
+        "secties":     antwoorden.get("secties", {})
+    }
+
+    # Stap 1 — Brand manual genereren via Groq
+    brand_manual = genereer_brand_manual(alle_antwoorden)
+    if not brand_manual:
+        return {"success": False, "bericht": "Brand manual genereren mislukt (Groq fout)"}
+
+    # Stap 2 — Gestructureerde brand data extraheren
+    brand_data   = extraheer_brand_data(brand_manual)
+    product_naam = brand_data.get("product_naam", "product")
+
+    # Stap 3 — Exporteer als markdown bestand
+    exporteer_markdown(product_naam, brand_manual)
+
+    # Stap 4 — Product reference + Soul ID + editing stijl
+    ref_data = genereer_product_reference(brand_manual, brand_data, alle_antwoorden)
+
+    # Stap 5 — Moodboard
+    moodboard_data = genereer_moodboard(brand_manual, brand_data)
+
+    # Stap 6 — Alles opslaan in Supabase
+    product_id = sla_op_in_supabase(
+        brand_data, brand_manual, alle_antwoorden,
+        doelland, doeltaal, product_url,
+        ref_data, moodboard_data
+    )
+
+    if product_id:
+        return {
+            "success":      True,
+            "product_id":   product_id,
+            "product_naam": product_naam,
+            "bericht":      f"Brand manual succesvol gegenereerd voor '{product_naam}'"
+        }
+
+    return {
+        "success": False,
+        "bericht": "Brand manual gegenereerd maar opslaan in Supabase mislukt"
+    }
+
+# ============================================================
 # BRAND MANUAL PROMPT
 # ============================================================
 
