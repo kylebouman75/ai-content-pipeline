@@ -8,11 +8,11 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg: #0a0a0a; --bg-card: #111; --bg-card-2: #161616;
-  --border: #1e1e1e; --border-2: #2a2a2a;
-  --accent: #e03131; --accent-dim: rgba(224,49,49,.15); --accent-glow: rgba(224,49,49,.25);
-  --text: #e2e2e2; --text-2: #999; --text-3: #555;
-  --success: #22c55e; --warn: #f59e0b; --error: #ef4444; --blue: #3b82f6;
+  --bg: #f4f4f5; --bg-card: #ffffff; --bg-card-2: #f9f9f9;
+  --border: #e4e4e7; --border-2: #d4d4d8;
+  --accent: #e03131; --accent-dim: rgba(224,49,49,.1); --accent-glow: rgba(224,49,49,.18);
+  --text: #18181b; --text-2: #52525b; --text-3: #a1a1aa;
+  --success: #16a34a; --warn: #d97706; --error: #dc2626; --blue: #2563eb;
   --log-gold: #ffd700; --log-green: #00d97e; --log-red: #ff4d4d; --log-orange: #ff8c00; --log-dim: #888;
 }
 
@@ -68,7 +68,7 @@ header {
 .agent-name-wrap { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 12px; }
 .agent-icon { font-size: 14px; line-height: 1; }
 .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 99px; letter-spacing: .4px; }
-.chip-wait  { background: rgba(85,85,85,.2);    color: #777; }
+.chip-wait  { background: rgba(100,100,100,.1);  color: var(--text-2); }
 .chip-run   { background: rgba(59,130,246,.15); color: #93c5fd; }
 .chip-done  { background: rgba(34,197,94,.15);  color: #86efac; }
 .chip-error { background: rgba(239,68,68,.15);  color: #fca5a5; }
@@ -132,7 +132,7 @@ header {
 .psb-label { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
 .psb-sub   { font-size: 10px; color: var(--text-3); margin-top: 3px; }
 .prod-card { background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 8px; padding: 11px 13px; margin-bottom: 8px; transition: border-color .2s; }
-.prod-card:hover { border-color: #333; }
+.prod-card:hover { border-color: var(--text-3); }
 .prod-card.has-manual { border-color: rgba(34,197,94,.3); }
 .prod-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
 .prod-name { font-size: 12px; font-weight: 600; line-height: 1.3; }
@@ -141,13 +141,13 @@ header {
 .pb-active  { background: rgba(34,197,94,.15);  color: #86efac; }
 .pb-running { background: rgba(59,130,246,.15); color: #93c5fd; }
 .pb-pending { background: rgba(245,158,11,.15); color: #fcd34d; }
-.pb-idle    { background: rgba(80,80,80,.2);    color: #777; }
+.pb-idle    { background: rgba(100,100,100,.1);  color: var(--text-2); }
 .pb-error   { background: rgba(239,68,68,.15);  color: #fca5a5; }
 .prod-steps { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 8px; }
 .prod-step  { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
 .step-done    { background: rgba(34,197,94,.12);  color: #86efac; }
 .step-next    { background: rgba(245,158,11,.12); color: #fcd34d; }
-.step-pending { background: rgba(60,60,60,.3);    color: #555; }
+.step-pending { background: rgba(100,100,100,.1);  color: var(--text-3); }
 .prod-hint    { font-size: 10px; color: var(--text-3); margin-bottom: 8px; padding-left: 4px; border-left: 2px solid var(--border-2); }
 .prod-actions { display: flex; gap: 6px; flex-wrap: wrap; }
 .add-btn-wrap { margin-top: 4px; }
@@ -178,7 +178,7 @@ header {
 }
 .overlay.open { opacity: 1; pointer-events: all; }
 .modal {
-  background: var(--bg-card); border: 1px solid #2e2e2e; border-radius: 12px;
+  background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 12px;
   width: 100%; max-width: 540px; max-height: 90vh;
   display: flex; flex-direction: column; overflow: hidden;
   transform: translateY(18px); transition: transform .2s;
@@ -218,7 +218,7 @@ header {
 .flabel { display: block; font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 5px; }
 .finput { width: 100%; background: var(--bg); border: 1px solid var(--border-2); border-radius: 6px; padding: 8px 11px; color: var(--text); font-size: 13px; font-family: inherit; outline: none; transition: border-color .15s, box-shadow .15s; }
 .finput:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
-.finput::placeholder { color: #444; }
+.finput::placeholder { color: var(--text-3); }
 .finput-ta { resize: vertical; min-height: 72px; line-height: 1.5; }
 
 /* ── MODAL STATES ── */
