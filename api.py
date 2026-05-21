@@ -135,20 +135,60 @@ def stop_pipeline():
     return {"success": True, "bericht": "Pipeline gestopt"}
 
 class NieuwProductData(BaseModel):
-    product_naam: str
+    product_naam: Optional[str] = ""
     product_url: Optional[str] = ""
     doelland: Optional[str] = "Nederland"
     doeltaal: Optional[str] = "Nederlands"
+    naam: Optional[str] = ""
+    url: Optional[str] = ""
+    name: Optional[str] = ""
 
 @app.post("/product/nieuw")
 def nieuw_product(data: NieuwProductData):
-    """Registreer een nieuw product — start Agent 0 interview via pipeline"""
-    log_toevoegen(f"Nieuw product aangemeld: {data.product_naam}", "gold")
-    return {
-        "success": True,
-        "bericht": f"Product {data.product_naam} aangemeld. Start het interview via de pipeline.",
-        "instructie": f"Voer uit op server: python3 {PIPELINE_DIR}/volledige_pipeline.py --interview"
+    """Registreer een nieuw product in Supabase"""
+    # Accepteer verschillende veldnamen
+    naam = data.product_naam or data.naam or data.name or "Nieuw product"
+    url  = data.product_url or data.url or ""
+
+    log_toevoegen(f"Nieuw product aangemeld: {naam}", "gold")
+
+    # Sla op in Supabase
+    import json
+    import urllib.request
+    record = {
+        "product_naam": naam,
+        "product_url":  url,
+        "doelland":     data.doelland,
+        "doeltaal":     data.doeltaal,
+        "status":       "Actief",
+        "research_gedaan": False
     }
+
+    payload = json.dumps(record).encode("utf-8")
+    req = urllib.request.Request(
+        f"{SUPABASE_URL}/rest/v1/producten",
+        data=payload,
+        method="POST"
+    )
+    req.add_header("apikey", SUPABASE_KEY)
+    req.add_header("Authorization", f"Bearer {SUPABASE_KEY}")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("Prefer", "return=representation")
+
+    try:
+        with urllib.request.urlopen(req) as r:
+            result = json.loads(r.read().decode())
+            product_id = result[0].get("id")
+            log_toevoegen(f"Product opgeslagen in Supabase — ID: {product_id}", "green")
+            return {
+                "success": True,
+                "product_id": product_id,
+                "bericht": f"Product {naam} toegevoegd met ID {product_id}. Start nu het brand interview."
+            }
+    except urllib.error.HTTPError as e:
+        fout = e.read().decode()
+        log_toevoegen(f"Supabase fout: {fout}", "red")
+        return {"success": False, "bericht": f"Fout: {fout}"}
 
 @app.get("/logs")
 def get_logs():
