@@ -5,7 +5,7 @@ Draait op Hetzner server, stuurt pipeline aan via HTTP endpoints
 
 from fastapi import FastAPI, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import subprocess
 import threading
@@ -82,6 +82,11 @@ def debug():
 @app.get("/")
 def root():
     return {"status": "AI Content Pipeline API draait", "versie": "1.0"}
+
+@app.get("/dashboard")
+async def dashboard():
+    """Serves het HTML dashboard"""
+    return FileResponse("/opt/ai-content-pipeline/dashboard.html")
 
 @app.get("/status")
 def get_status():
