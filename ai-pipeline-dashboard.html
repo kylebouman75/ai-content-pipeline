@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Content Pipeline</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0a0a;
+  --bg-card: #111111;
+  --bg-card-2: #161616;
+  --border: #1e1e1e;
+  --border-2: #2a2a2a;
+  --accent: #e03131;
+  --accent-dim: rgba(224,49,49,0.15);
+  --accent-glow: rgba(224,49,49,0.25);
+  --text: #e2e2e2;
+  --text-2: #999;
+  --text-3: #555;
+  --success: #22c55e;
+  --warn: #f59e0b;
+  --error: #ef4444;
+  --blue: #3b82f6;
+  --log-gold: #ffd700;
+  --log-green: #00d97e;
+  --log-red: #ff4d4d;
+  --log-orange: #ff8c00;
+  --log-dim: #888;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ── HEADER ── */
+header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  z-index: 50;
+}
+.hdr-left { display: flex; align-items: center; gap: 10px; }
+.hdr-logo  { font-size: 20px; line-height: 1; }
+.hdr-title { font-size: 16px; font-weight: 700; letter-spacing: -.3px; }
+.hdr-title em { color: var(--accent); font-style: normal; }
+.hdr-right { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text-2); }
+
+.conn-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--text-3); flex-shrink: 0;
+  transition: background .3s, box-shadow .3s;
+}
+.conn-dot.ok  { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.conn-dot.err { background: var(--error);   box-shadow: 0 0 6px var(--error); }
+.conn-dot.run { background: var(--blue);    box-shadow: 0 0 6px var(--blue); animation: pulse 1.4s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+
+/* ── GRID ── */
+.grid {
+  display: grid;
+  grid-template-columns: 290px 1fr 300px;
+  flex: 1; overflow: hidden;
+}
+.col {
+  display: flex; flex-direction: column; overflow: hidden;
+  border-right: 1px solid var(--border);
+}
+.col:last-child { border-right: none; }
+.col-hdr {
+  padding: 12px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.col-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+  text-transform: uppercase; color: var(--text-3);
+}
+.col-body { flex: 1; overflow-y: auto; padding: 14px; }
+
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+/* ── AGENTS ── */
+.agent-card {
+  background: var(--bg-card); border: 1px solid var(--border-2);
+  border-radius: 8px; padding: 11px 13px;
+  transition: border-color .2s, box-shadow .2s;
+}
+.agent-card.running { border-color: var(--blue); box-shadow: 0 0 0 1px var(--blue), inset 0 0 20px rgba(59,130,246,.06); }
+.agent-card.done    { border-color: var(--success); }
+.agent-card.error   { border-color: var(--error); }
+
+.agent-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+.agent-name-wrap { display: flex; align-items: center; gap: 7px; font-weight: 600; font-size: 12px; }
+.agent-icon { font-size: 14px; line-height: 1; }
+
+.status-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 10px; font-weight: 600; padding: 2px 7px;
+  border-radius: 99px; letter-spacing: .4px;
+}
+.chip-wait  { background: rgba(85,85,85,.2);    color: #777; }
+.chip-run   { background: rgba(59,130,246,.15); color: #93c5fd; }
+.chip-done  { background: rgba(34,197,94,.15);  color: #86efac; }
+.chip-error { background: rgba(239,68,68,.15);  color: #fca5a5; }
+.chip-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.chip-wait  .chip-dot { background: #666; }
+.chip-run   .chip-dot { background: var(--blue); animation: pulse 1.2s infinite; }
+.chip-done  .chip-dot { background: var(--success); }
+.chip-error .chip-dot { background: var(--error); }
+
+.agent-desc { font-size: 11px; color: var(--text-2); }
+.flow-arrow { display: flex; flex-direction: column; align-items: center; padding: 3px 0; color: var(--border-2); }
+.arrow-stem { width: 1px; height: 10px; background: var(--border-2); }
+.arrow-tip  { font-size: 9px; line-height: 1; }
+
+/* ── BUTTONS ── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 5px; border: none; border-radius: 6px; font-size: 12px;
+  font-weight: 600; padding: 9px 14px; cursor: pointer;
+  transition: all .15s; letter-spacing: .2px; font-family: inherit;
+}
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-red   { background: var(--accent); color: #fff; }
+.btn-red:hover:not(:disabled) { background: #c92a2a; box-shadow: 0 0 16px var(--accent-glow); }
+.btn-ghost { background: transparent; color: var(--text-2); border: 1px solid var(--border-2); font-size: 11px; padding: 5px 10px; }
+.btn-ghost:hover { color: var(--text); border-color: #444; }
+.btn-dark  { background: var(--bg-card-2); color: var(--text-2); border: 1px solid var(--border-2); }
+.btn-dark:hover:not(:disabled) { border-color: #444; color: var(--text); }
+.btn-green { background: rgba(34,197,94,.12); color: #86efac; border: 1px solid rgba(34,197,94,.25); font-size: 11px; padding: 6px 12px; }
+.btn-green:hover:not(:disabled) { background: rgba(34,197,94,.22); }
+.btn-amber { background: rgba(245,158,11,.12); color: #fcd34d; border: 1px solid rgba(245,158,11,.25); font-size: 11px; padding: 6px 12px; }
+.btn-amber:hover { background: rgba(245,158,11,.22); }
+.btn-sm { font-size: 11px; padding: 5px 10px; }
+.action-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
+
+/* ── TERMINAL ── */
+.term-col { background: #050505; }
+.term-topbar {
+  background: #0d0d0d; border-bottom: 1px solid var(--border);
+  padding: 10px 14px; display: flex; align-items: center;
+  justify-content: space-between; flex-shrink: 0;
+}
+.term-macos { display: flex; gap: 5px; }
+.term-mac-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mac-r { background: #ff5f56; } .mac-y { background: #ffbd2e; } .mac-g { background: #27c93f; }
+.term-ttl { font-size: 11px; color: #555; font-family: monospace; }
+.term-body {
+  flex: 1; overflow-y: auto; padding: 12px 14px;
+  font-family: 'Consolas','Monaco','Courier New',monospace;
+  font-size: 12px; line-height: 1.65; background: #050505;
+}
+.log-row { display: flex; gap: 7px; padding: 1px 0; word-break: break-all; }
+.log-ts  { color: #3a3a3a; flex-shrink: 0; font-size: 10px; padding-top: 2px; }
+.log-tag { font-size: 9px; font-weight: 700; padding: 1px 4px; border-radius: 3px; flex-shrink: 0; align-self: flex-start; margin-top: 3px; letter-spacing: .5px; }
+.log-txt { flex: 1; }
+.lt-pipe  .log-txt { color: var(--log-gold); }   .lt-pipe  .log-tag { background: rgba(255,215,0,.12); color: var(--log-gold); }
+.lt-ok    .log-txt { color: var(--log-green); }  .lt-ok    .log-tag { background: rgba(0,217,126,.12); color: var(--log-green); }
+.lt-err   .log-txt { color: var(--log-red); }    .lt-err   .log-tag { background: rgba(255,77,77,.12); color: var(--log-red); }
+.lt-agent .log-txt { color: var(--log-orange); } .lt-agent .log-tag { background: rgba(255,140,0,.12); color: var(--log-orange); }
+.lt-info  .log-txt { color: var(--log-dim); }    .lt-info  .log-tag { background: rgba(136,136,136,.12); color: #666; }
+.term-empty { color: #333; font-style: italic; font-size: 12px; font-family: monospace; }
+.term-cursor { display: inline-block; width: 7px; height: 13px; background: var(--accent); vertical-align: text-bottom; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── PRODUCTS ── */
+.pipe-status-bar {
+  background: var(--bg-card); border: 1px solid var(--border-2);
+  border-radius: 8px; padding: 10px 13px; margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.psb-label { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.psb-sub   { font-size: 10px; color: var(--text-3); margin-top: 3px; }
+
+.prod-card {
+  background: var(--bg-card); border: 1px solid var(--border-2);
+  border-radius: 8px; padding: 11px 13px; margin-bottom: 8px;
+  transition: border-color .2s;
+}
+.prod-card:hover { border-color: #333; }
+.prod-card.has-manual { border-color: rgba(34,197,94,.25); }
+
+.prod-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.prod-name { font-size: 12px; font-weight: 600; line-height: 1.3; }
+.prod-id   { font-size: 10px; color: var(--text-3); font-family: monospace; margin-top: 2px; }
+
+.prod-badge { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; white-space: nowrap; flex-shrink: 0; letter-spacing: .4px; }
+.pb-active  { background: rgba(34,197,94,.15);  color: #86efac; }
+.pb-running { background: rgba(59,130,246,.15); color: #93c5fd; }
+.pb-pending { background: rgba(245,158,11,.15); color: #fcd34d; }
+.pb-idle    { background: rgba(80,80,80,.2);    color: #777; }
+.pb-error   { background: rgba(239,68,68,.15);  color: #fca5a5; }
+
+/* Agent progress steps inside product card */
+.prod-steps {
+  display: flex; gap: 5px; margin-bottom: 9px; flex-wrap: wrap;
+}
+.prod-step {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600;
+}
+.step-done    { background: rgba(34,197,94,.12); color: #86efac; }
+.step-next    { background: rgba(245,158,11,.12); color: #fcd34d; }
+.step-pending { background: rgba(60,60,60,.3);   color: #555; }
+
+.prod-next-hint {
+  font-size: 10px; color: var(--text-3); margin-bottom: 8px;
+  display: flex; align-items: center; gap: 5px;
+}
+.prod-next-hint::before { content: '→'; color: var(--accent); }
+
+.prod-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.add-btn-wrap { margin-top: 4px; }
+.add-btn-wrap .btn { width: 100%; }
+
+.empty-state { text-align: center; padding: 28px 12px; color: var(--text-3); }
+.empty-ico   { font-size: 28px; margin-bottom: 8px; opacity: .5; }
+.empty-txt   { font-size: 12px; line-height: 1.5; }
+
+/* ── MODAL ── */
+.overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.85);
+  backdrop-filter: blur(6px); z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+
+.modal {
+  background: var(--bg-card); border: 1px solid #2e2e2e;
+  border-radius: 12px; width: 100%; max-width: 520px;
+  max-height: 88vh; display: flex; flex-direction: column;
+  transform: translateY(18px); transition: transform .2s;
+  overflow: hidden;
+}
+.overlay.open .modal { transform: translateY(0); }
+
+.modal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 18px; border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.modal-ttl { font-size: 14px; font-weight: 700; }
+.modal-ttl em { color: var(--accent); font-style: normal; }
+.modal-close {
+  background: none; border: none; color: var(--text-3); font-size: 18px;
+  cursor: pointer; line-height: 1; padding: 2px 6px; border-radius: 4px;
+  transition: color .15s;
+}
+.modal-close:hover { color: var(--text); }
+
+/* Wizard progress bar */
+.wizard-bar {
+  display: flex; align-items: center; padding: 10px 18px;
+  border-bottom: 1px solid var(--border); gap: 6px; flex-shrink: 0;
+}
+.wz-step {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; color: var(--text-3);
+  letter-spacing: .4px;
+}
+.wz-step.active { color: var(--text); }
+.wz-step.done   { color: var(--success); }
+.wz-num {
+  width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 700; background: var(--border-2); color: var(--text-3);
+}
+.wz-step.active .wz-num { background: var(--accent); color: #fff; }
+.wz-step.done   .wz-num { background: var(--success); color: #000; }
+.wz-sep { flex: 1; height: 1px; background: var(--border-2); }
+
+/* Modal scrollable body */
+.modal-body {
+  overflow-y: auto; padding: 18px; flex: 1;
+}
+
+/* Form sections */
+.form-section { margin-bottom: 20px; }
+.form-section:last-child { margin-bottom: 0; }
+.form-section-title {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--accent);
+  padding-bottom: 7px; margin-bottom: 10px;
+  border-bottom: 1px solid var(--border-2);
+}
+.fg { margin-bottom: 11px; }
+.fg:last-child { margin-bottom: 0; }
+.flabel { display: block; font-size: 10px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .7px; margin-bottom: 5px; }
+.finput {
+  width: 100%; background: var(--bg); border: 1px solid var(--border-2);
+  border-radius: 6px; padding: 8px 11px; color: var(--text);
+  font-size: 13px; font-family: inherit; outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+.finput:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-dim); }
+.finput::placeholder { color: #444; }
+.finput-ta { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+/* Modal footer (buttons) */
+.modal-foot {
+  padding: 14px 18px; border-top: 1px solid var(--border);
+  display: flex; gap: 8px; flex-shrink: 0;
+}
+.modal-foot .btn { flex: 1; }
+
+/* Loading state */
+.state-loading {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 48px 20px; gap: 14px;
+}
+.spinner {
+  width: 32px; height: 32px; border: 3px solid var(--border-2);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.state-loading-txt { font-size: 13px; color: var(--text-2); }
+
+/* Processing state */
+.state-processing { padding: 18px; }
+.proc-header {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 14px;
+}
+.proc-title { font-size: 13px; font-weight: 600; }
+.proc-sub   { font-size: 11px; color: var(--text-2); margin-top: 2px; }
+
+.mini-term {
+  background: #050505; border: 1px solid var(--border);
+  border-radius: 6px; padding: 10px 12px; height: 160px;
+  overflow-y: auto; font-family: monospace; font-size: 11px;
+  color: #777; line-height: 1.6;
+}
+.mini-log-line { padding: 1px 0; word-break: break-all; }
+.mini-log-line.log-ok  { color: var(--log-green); }
+.mini-log-line.log-err { color: var(--log-red); }
+.mini-log-line.log-ag  { color: var(--log-orange); }
+.mini-empty { color: #333; font-style: italic; }
+
+/* Done state */
+.state-done {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 20px 20px; gap: 10px; text-align: center;
+}
+.done-ico { font-size: 44px; color: var(--success); line-height: 1; }
+.done-title { font-size: 16px; font-weight: 700; }
+.done-sub   { font-size: 12px; color: var(--text-2); }
+
+/* Error state */
+.state-error {
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 32px 20px 20px; gap: 10px; text-align: center;
+}
+.err-ico   { font-size: 44px; color: var(--error); line-height: 1; }
+.err-title { font-size: 15px; font-weight: 700; }
+.err-msg   { font-size: 12px; color: var(--text-2); max-width: 340px; line-height: 1.5; }
+
+/* ── TOAST ── */
+#toasts { position: fixed; bottom: 18px; right: 18px; z-index: 300; display: flex; flex-direction: column; gap: 7px; pointer-events: none; }
+.toast { background: var(--bg-card); border: 1px solid var(--border-2); border-radius: 8px; padding: 9px 13px; font-size: 12px; display: flex; align-items: center; gap: 7px; min-width: 220px; max-width: 300px; animation: toastIn .2s ease; pointer-events: all; transition: opacity .3s, transform .3s; }
+@keyframes toastIn { from { transform: translateX(100%); opacity: 0; } }
+.toast-ok   { border-color: rgba(34,197,94,.35); }
+.toast-err  { border-color: rgba(239,68,68,.35); }
+.toast-info { border-color: rgba(59,130,246,.35); }
+.toast-ico  { font-size: 14px; flex-shrink: 0; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1050px) { .grid { grid-template-columns: 250px 1fr 260px; } }
+@media (max-width: 800px) {
+  body { overflow: auto; height: auto; }
+  .grid { grid-template-columns: 1fr; height: auto; }
+  .col { height: auto; min-height: 350px; border-right: none; border-bottom: 1px solid var(--border); }
+  .col:last-child { border-bottom: none; }
+  .term-body { min-height: 280px; }
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="hdr-left">
+    <span class="hdr-logo">🤖</span>
+    <h1 class="hdr-title">AI Content <em>Pipeline</em></h1>
+  </div>
+  <div class="hdr-right">
+    <div class="conn-dot" id="connDot"></div>
+    <span id="connTxt">Verbinden...</span>
+    <span id="lastUpdated" style="color:var(--text-3)"></span>
+  </div>
+</header>
+
+<!-- MAIN GRID -->
+<div class="grid">
+
+  <!-- ═══ KOLOM 1: Pipeline overzicht ═══ -->
+  <div class="col">
+    <div class="col-hdr"><span class="col-label">Pipeline Overzicht</span></div>
+    <div class="col-body">
+      <div id="agentFlow"></div>
+      <div class="action-btns">
+        <button class="btn btn-red" id="btnStart" onclick="pipelineStart(null, null)">▶&ensp;Pipeline Starten</button>
+        <button class="btn btn-dark" id="btnStop"  onclick="pipelineStop()">⬛&ensp;Pipeline Stoppen</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ KOLOM 2: Live terminal ═══ -->
+  <div class="col term-col">
+    <div class="term-topbar">
+      <div class="term-macos">
+        <div class="term-mac-dot mac-r"></div>
+        <div class="term-mac-dot mac-y"></div>
+        <div class="term-mac-dot mac-g"></div>
+      </div>
+      <span class="term-ttl">pipeline.log — live output</span>
+      <button class="btn btn-ghost" onclick="clearLogs()">Wissen</button>
+    </div>
+    <div class="term-body" id="terminal">
+      <span class="term-empty">Wachten op logs…&ensp;<span class="term-cursor"></span></span>
+    </div>
+  </div>
+
+  <!-- ═══ KOLOM 3: Producten ═══ -->
+  <div class="col">
+    <div class="col-hdr"><span class="col-label">Producten &amp; Acties</span></div>
+    <div class="col-body">
+      <div class="pipe-status-bar">
+        <div>
+          <div class="psb-label">
+            <div class="conn-dot" id="pipeDot"></div>
+            <span id="pipeLabelTxt">Onbekend</span>
+          </div>
+          <div class="psb-sub" id="pipeLastRun">Laatste run: —</div>
+        </div>
+      </div>
+
+      <div id="productList">
+        <div class="empty-state">
+          <div class="empty-ico">📦</div>
+          <div class="empty-txt">Producten laden…</div>
+        </div>
+      </div>
+
+      <div class="add-btn-wrap">
+        <button class="btn btn-red" onclick="openModal()">+&ensp;Nieuw Product Toevoegen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: Multi-step wizard ═══ -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal">
+
+    <!-- Header -->
+    <div class="modal-hdr">
+      <div class="modal-ttl" id="modalTitle">Nieuw Product <em>Toevoegen</em></div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- Wizard progress bar -->
+    <div class="wizard-bar" id="wizardBar">
+      <div class="wz-step active" id="wz0">
+        <div class="wz-num">1</div><span>Vragen</span>
+      </div>
+      <div class="wz-sep"></div>
+      <div class="wz-step" id="wz1">
+        <div class="wz-num">2</div><span>Genereren</span>
+      </div>
+      <div class="wz-sep"></div>
+      <div class="wz-step" id="wz2">
+        <div class="wz-num">3</div><span>Klaar</span>
+      </div>
+    </div>
+
+    <!-- STATE: Loading questions -->
+    <div id="ms-loading">
+      <div class="state-loading">
+        <div class="spinner"></div>
+        <div class="state-loading-txt">Brand interview vragen laden…</div>
+      </div>
+    </div>
+
+    <!-- STATE: Form -->
+    <div id="ms-form" hidden>
+      <form id="agentForm" onsubmit="submitAgent0(event)">
+        <div class="modal-body">
+          <div id="formSections"></div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-dark" onclick="closeModal()">Annuleren</button>
+          <button type="submit" class="btn btn-red" id="agent0Btn">
+            🚀&ensp;Brand Manual Genereren
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- STATE: Processing -->
+    <div id="ms-processing" hidden>
+      <div class="state-processing">
+        <div class="proc-header">
+          <div class="spinner"></div>
+          <div>
+            <div class="proc-title">Brand Manual wordt aangemaakt…</div>
+            <div class="proc-sub">Dit kan 1–3 minuten duren. Voortgang in de terminal hieronder.</div>
+          </div>
+        </div>
+        <div class="mini-term" id="miniTerm">
+          <div class="mini-empty">Wachten op Agent 0 output…</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATE: Done -->
+    <div id="ms-done" hidden>
+      <div class="state-done">
+        <div class="done-ico">✓</div>
+        <div class="done-title">Brand Manual Gegenereerd!</div>
+        <div class="done-sub" id="doneProductName"></div>
+        <div class="done-sub">Je kunt nu de volledige pipeline starten voor dit product.</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-dark" onclick="closeModal()">Sluiten</button>
+        <button class="btn btn-red" onclick="startPipelineFromModal()">
+          ▶&ensp;Pipeline Starten voor dit Product
+        </button>
+      </div>
+    </div>
+
+    <!-- STATE: Error -->
+    <div id="ms-error" hidden>
+      <div class="state-error">
+        <div class="err-ico">⚠️</div>
+        <div class="err-title">Er ging iets mis</div>
+        <div class="err-msg" id="errMsg">Onbekende fout</div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-dark" onclick="closeModal()">Sluiten</button>
+        <button class="btn btn-red" onclick="retryModal()">Opnieuw proberen</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div id="toasts"></div>
+
+<script>
+const API = 'http://162.55.215.56:8000';
+
+// ─── Agent definitions ────────────────────────────────────────────────
+const AGENTS = [
+  { id: 0, icon: '🎤', name: 'Brand Interview',  desc: 'Eenmalig per product' },
+  { id: 1, icon: '🔍', name: 'Market Research',  desc: 'Eenmalig, gecached' },
+  { id: 2, icon: '✍️', name: 'Script Maker',     desc: 'Dagelijks, 2× 8 sec scripts' },
+  { id: 3, icon: '🎬', name: 'Video Generator',  desc: 'Higgsfield prompts' },
+  { id: 4, icon: '📱', name: 'Publisher',         desc: 'Instagram + TikTok' },
+  { id: 5, icon: '📊', name: 'Performance',       desc: 'Feedback loop na 24u' },
+];
+
+// ─── Global state ─────────────────────────────────────────────────────
+let agentStates    = ['wait','wait','wait','wait','wait','wait'];
+let seenLogs       = new Set();
+let pipeRunning    = false;
+let autoScroll     = true;
+
+// Modal state
+let newProductId       = null;
+let miniSeenLogs       = new Set();
+let procPollInterval   = null;  // polling logs during processing
+let completionInterval = null;  // polling for agent0 done
+let procStartTime      = null;
+const PROC_TIMEOUT_MS  = 6 * 60 * 1000; // 6 minutes
+
+// ─── Render agents ────────────────────────────────────────────────────
+function renderAgents() {
+  const el = document.getElementById('agentFlow');
+  el.innerHTML = '';
+  AGENTS.forEach((a, i) => {
+    const st = agentStates[i];
+    const cc = { wait:'chip-wait', running:'chip-run', done:'chip-done', error:'chip-error' }[st] || 'chip-wait';
+    const cl = { wait:'Wacht',     running:'Draait',   done:'Klaar',    error:'Fout' }[st]    || st;
+    const card = document.createElement('div');
+    card.className = `agent-card ${st}`;
+    card.innerHTML = `
+      <div class="agent-row">
+        <div class="agent-name-wrap">
+          <span class="agent-icon">${a.icon}</span>
+          <span>Agent ${a.id} — ${a.name}</span>
+        </div>
+        <span class="status-chip ${cc}"><span class="chip-dot"></span>${cl}</span>
+      </div>
+      <div class="agent-desc">${a.desc}</div>`;
+    el.appendChild(card);
+    if (i < AGENTS.length - 1) {
+      const arr = document.createElement('div');
+      arr.className = 'flow-arrow';
+      arr.innerHTML = '<div class="arrow-stem"></div><div class="arrow-tip">▼</div>';
+      el.appendChild(arr);
+    }
+  });
+}
+
+function setAgentState(idx, st) {
+  if (idx < 0 || idx >= AGENTS.length || agentStates[idx] === st) return;
+  agentStates[idx] = st;
+  renderAgents();
+}
+
+// ─── Log helpers ──────────────────────────────────────────────────────
+function logMessage(raw)   { return typeof raw === 'string' ? raw : raw?.message || raw?.msg || raw?.text || JSON.stringify(raw); }
+function logTimestamp(raw) {
+  const ts = typeof raw === 'object' ? raw?.timestamp || raw?.time || raw?.ts : null;
+  if (ts) { const d = new Date(ts); if (!isNaN(d)) return d.toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}); }
+  return new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+function logKey(raw) {
+  return typeof raw === 'object'
+    ? `${raw.id||''}|${raw.timestamp||''}|${logMessage(raw)}`
+    : String(raw);
+}
+function classifyLog(raw) {
+  const msg = logMessage(raw).toLowerCase();
+  const lvl = (typeof raw === 'object' ? raw?.level || raw?.type || '' : '').toLowerCase();
+  if (lvl==='error'   || /\b(error|fout|failed|exception|traceback)\b/.test(msg)) return 'lt-err';
+  if (lvl==='success' || /\b(success|geslaagd|voltooid|done|completed)\b/.test(msg)) return 'lt-ok';
+  if (/\bpipeline\b/.test(msg)) return 'lt-pipe';
+  if (lvl==='agent'   || /\b(agent|brand interview|market research|script maker|video generator|publisher|performance)\b/.test(msg)) return 'lt-agent';
+  return 'lt-info';
+}
+function tagLabel(cls) { return {'lt-pipe':'PIPE','lt-ok':'OK','lt-err':'ERR','lt-agent':'AGENT','lt-info':'INFO'}[cls]||'LOG'; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ─── Main terminal ────────────────────────────────────────────────────
+function appendLogEntry(raw) {
+  const term  = document.getElementById('terminal');
+  const empty = term.querySelector('.term-empty');
+  if (empty) empty.remove();
+  const cls = classifyLog(raw);
+  const row = document.createElement('div');
+  row.className = `log-row ${cls}`;
+  row.innerHTML = `<span class="log-ts">${logTimestamp(raw)}</span><span class="log-tag">${tagLabel(cls)}</span><span class="log-txt">${esc(logMessage(raw))}</span>`;
+  term.appendChild(row);
+  detectAgentFromLog(logMessage(raw).toLowerCase());
+  if (autoScroll) term.scrollTop = term.scrollHeight;
+}
+
+function detectAgentFromLog(msg) {
+  AGENTS.forEach((a, i) => {
+    if (!msg.includes(a.name.toLowerCase()) && !msg.includes(`agent ${a.id}`)) return;
+    if (/start|bezig|running|draait/.test(msg))                  setAgentState(i,'running');
+    else if (/klaar|done|success|voltooid|completed/.test(msg))  setAgentState(i,'done');
+    else if (/error|fout|failed/.test(msg))                      setAgentState(i,'error');
+  });
+}
+
+function clearLogs() {
+  document.getElementById('terminal').innerHTML = '<span class="term-empty">Logs gewist.&ensp;<span class="term-cursor"></span></span>';
+  seenLogs.clear();
+  toast('Logs gewist','info');
+}
+
+// ─── Fetch: logs (main terminal) ──────────────────────────────────────
+async function fetchLogs() {
+  try {
+    const res = await fetch(`${API}/logs`,{signal:AbortSignal.timeout(5000)});
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const logs = Array.isArray(data) ? data : data?.logs||data?.data||data?.items||[];
+    for (const log of logs) {
+      const k = logKey(log);
+      if (!seenLogs.has(k)) { seenLogs.add(k); appendLogEntry(log); }
+    }
+    setConn('ok');
+  } catch (_) {}
+}
+
+// ─── Fetch: products ──────────────────────────────────────────────────
+async function fetchProducts() {
+  try {
+    const res = await fetch(`${API}/producten`,{signal:AbortSignal.timeout(5000)});
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    const list = Array.isArray(data) ? data : data?.producten||data?.products||data?.data||data?.items||[];
+    renderProducts(list);
+    setConn('ok');
+  } catch (_) {
+    document.getElementById('productList').innerHTML =
+      '<div class="empty-state"><div class="empty-ico">⚠️</div><div class="empty-txt">Producten niet beschikbaar</div></div>';
+  }
+}
+
+// ─── Product status helpers ────────────────────────────────────────────
+function hasBrandManual(p) {
+  const s = (p.status||p.stap||'').toLowerCase();
+  return !!(
+    p.heeft_brand_manual || p.brand_manual || p.brand_manual_klaar ||
+    p.agent0_klaar       || p.agent_0_klaar ||
+    (p.agent_status && ['done','klaar','completed'].includes((p.agent_status.agent0||'').toLowerCase())) ||
+    ['research','script','video','publisher','performance','active','actief','klaar'].some(v => s.includes(v))
+  );
+}
+
+function hasResearch(p) {
+  const s = (p.status||p.stap||'').toLowerCase();
+  return !!(
+    p.heeft_research || p.research_gedaan || p.research_klaar ||
+    p.agent2_klaar   || p.agent_2_klaar   ||
+    (p.agent_status && ['done','klaar','completed'].includes((p.agent_status.agent2||'').toLowerCase())) ||
+    ['script','video','publisher','performance','active','actief'].some(v => s.includes(v))
+  );
+}
+
+function prodBadge(s) {
+  if (['active','actief','done','klaar','completed'].includes(s)) return ['pb-active','Actief'];
+  if (['running','draait','bezig'].includes(s))                    return ['pb-running','Draait'];
+  if (['pending','wacht'].includes(s))                             return ['pb-pending','Wacht'];
+  if (['error','fout','failed'].includes(s))                       return ['pb-error','Fout'];
+  return ['pb-idle','Inactief'];
+}
+
+// ─── Render products ──────────────────────────────────────────────────
+function renderProducts(list) {
+  const el = document.getElementById('productList');
+  if (!list || list.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="empty-ico">📦</div><div class="empty-txt">Geen producten gevonden.<br>Voeg een product toe om te beginnen.</div></div>';
+    return;
+  }
+
+  el.innerHTML = list.map(p => {
+    const name      = p.naam || p.name || p.title || p.product_naam || 'Onbekend';
+    const id        = p.id   || p.product_id || p._id || '—';
+    const status    = (p.status||'idle').toLowerCase();
+    const [bClass, bLabel] = prodBadge(status);
+    const manual    = hasBrandManual(p);
+    const research  = hasResearch(p);
+    const safeId    = esc(String(id));
+    const safeName  = esc(String(name));
+
+    // Build step indicators
+    const step0 = manual
+      ? `<span class="prod-step step-done">✓ Brand Manual</span>`
+      : `<span class="prod-step step-next">○ Brand Manual</span>`;
+    const step1 = research
+      ? `<span class="prod-step step-done">✓ Market Research</span>`
+      : manual
+        ? `<span class="prod-step step-next">○ Market Research</span>`
+        : `<span class="prod-step step-pending">○ Market Research</span>`;
+
+    // Next step hint
+    let nextHint = '';
+    if (!manual)   nextHint = `<div class="prod-next-hint">Brand Manual genereren vereist</div>`;
+    else if (!research) nextHint = `<div class="prod-next-hint">Research klaar na pipeline start</div>`;
+
+    // Action buttons
+    let actions = '';
+    if (manual) {
+      actions = `<button class="btn btn-green" onclick="pipelineStart('${safeId}','${safeName}')">▶&ensp;Pipeline Starten</button>`;
+    } else {
+      actions = `<button class="btn btn-amber" onclick="openModalForProduct('${safeId}','${safeName}')">🎤&ensp;Brand Manual Maken</button>`;
+    }
+
+    return `
+      <div class="prod-card ${manual ? 'has-manual' : ''}">
+        <div class="prod-top">
+          <div>
+            <div class="prod-name">${safeName}</div>
+            <div class="prod-id">ID: ${safeId}</div>
+          </div>
+          <span class="prod-badge ${bClass}">${bLabel}</span>
+        </div>
+        <div class="prod-steps">${step0}${step1}</div>
+        ${nextHint}
+        <div class="prod-actions">${actions}</div>
+      </div>`;
+  }).join('');
+}
+
+// ─── Fetch: pipeline status ────────────────────────────────────────────
+async function fetchStatus() {
+  for (const ep of ['/status','/pipeline/status']) {
+    try {
+      const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(4000)});
+      if (!res.ok) continue;
+      const data = await res.json();
+      const running = !!(data.running||data.is_running||data.active);
+      const lastRun = data.last_run||data.lastRun||data.timestamp||null;
+      pipeRunning = running;
+      updatePipeBar(running, lastRun);
+      const agents = data.agents||data.agent_statuses||[];
+      agents.forEach((a,i) => {
+        if (i>=AGENTS.length) return;
+        const s = (a.status||a.state||'wait').toLowerCase();
+        agentStates[i] = s==='running'||s==='active'||s==='draait' ? 'running'
+          : s==='done'||s==='klaar'||s==='completed' ? 'done'
+          : s==='error'||s==='fout'||s==='failed' ? 'error' : 'wait';
+      });
+      if (agents.length) renderAgents();
+      setConn(running ? 'run' : 'ok');
+      return;
+    } catch (_) {}
+  }
+}
+
+function updatePipeBar(running, lastRun) {
+  document.getElementById('pipeDot').className     = `conn-dot ${running ? 'run' : 'ok'}`;
+  document.getElementById('pipeLabelTxt').textContent = running ? 'Pipeline draait' : 'Gestopt';
+  if (lastRun) {
+    const d = new Date(lastRun);
+    document.getElementById('pipeLastRun').textContent = `Laatste run: ${isNaN(d) ? lastRun : d.toLocaleString('nl-NL')}`;
+  }
+}
+
+// ─── Pipeline actions ──────────────────────────────────────────────────
+async function pipelineStart(productId, productName) {
+  const btn = document.getElementById('btnStart');
+  btn.disabled = true; btn.textContent = '▶ Starten…';
+  try {
+    const body = productId ? { product_id: productId } : {};
+    const res = await fetch(`${API}/pipeline/starten`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body), signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    toast(productName ? `Pipeline gestart voor ${productName}!` : 'Pipeline gestart!', 'ok');
+    pipeRunning = true;
+    updatePipeBar(true, new Date().toISOString());
+    agentStates = ['running','wait','wait','wait','wait','wait'];
+    renderAgents();
+  } catch (e) { toast(`Fout bij starten: ${e.message}`,'err'); }
+  finally { btn.disabled=false; btn.innerHTML='▶&ensp;Pipeline Starten'; }
+}
+
+async function pipelineStop() {
+  const btn = document.getElementById('btnStop');
+  btn.disabled=true; btn.textContent='⬛ Stoppen…';
+  try {
+    const res = await fetch(`${API}/pipeline/stoppen`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    toast('Pipeline gestopt.','info');
+    pipeRunning = false;
+    updatePipeBar(false, null);
+    agentStates = ['wait','wait','wait','wait','wait','wait'];
+    renderAgents();
+  } catch (e) { toast(`Fout bij stoppen: ${e.message}`,'err'); }
+  finally { btn.disabled=false; btn.innerHTML='⬛&ensp;Pipeline Stoppen'; }
+}
+
+// ─── MODAL: Wizard states ─────────────────────────────────────────────
+const MODAL_STATES = ['loading','form','processing','done','error'];
+
+function setModalState(state) {
+  MODAL_STATES.forEach(s => {
+    const el = document.getElementById(`ms-${s}`);
+    if (el) el.hidden = (s !== state);
+  });
+  // Update wizard bar
+  const step = { loading:0, form:0, processing:1, done:2, error:2 }[state] ?? 0;
+  ['wz0','wz1','wz2'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = 'wz-step' + (i < step ? ' done' : i === step ? ' active' : '');
+    el.querySelector('.wz-num').textContent = i < step ? '✓' : i + 1;
+  });
+}
+
+// ─── Modal open / close ───────────────────────────────────────────────
+async function openModal(prefillId = null, prefillName = null) {
+  newProductId = prefillId;
+  miniSeenLogs.clear();
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('modalTitle').innerHTML =
+    prefillName ? `Brand Manual voor <em>${esc(prefillName)}</em>` : 'Nieuw Product <em>Toevoegen</em>';
+
+  setModalState('loading');
+
+  try {
+    const res = await fetch(`${API}/agent0/vragen`,{signal:AbortSignal.timeout(8000)});
+    if (res.ok) {
+      const data = await res.json();
+      buildQuestionForm(data, prefillId, prefillName);
+    } else {
+      buildFallbackForm();
+    }
+  } catch (_) {
+    buildFallbackForm();
+  }
+  setModalState('form');
+}
+
+function openModalForProduct(id, name) { openModal(id, name); }
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  stopProcessingPolls();
+}
+
+function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
+
+function retryModal() { openModal(newProductId); }
+
+// ─── Build question form ──────────────────────────────────────────────
+function buildQuestionForm(data, prefillId, prefillName) {
+  // Normalize to array of sections
+  let sections = [];
+  if (data.secties || data.sections) {
+    sections = data.secties || data.sections;
+  } else if (Array.isArray(data)) {
+    // Flat list — group by sectie
+    const map = {};
+    data.forEach(v => {
+      const key = v.sectie || v.category || v.groep || 'Algemeen';
+      if (!map[key]) map[key] = [];
+      map[key].push(v);
+    });
+    sections = Object.entries(map).map(([naam, vragen]) => ({naam, vragen}));
+  } else if (data.vragen) {
+    sections = [{ naam: 'Vragen', vragen: data.vragen }];
+  } else {
+    buildFallbackForm(prefillId, prefillName); return;
+  }
+  if (!sections.length) { buildFallbackForm(prefillId, prefillName); return; }
+
+  document.getElementById('formSections').innerHTML = sections.map((s, si) => `
+    <div class="form-section">
+      <div class="form-section-title">${esc(s.naam || `Sectie ${si+1}`)}</div>
+      ${(s.vragen||[]).map((v, vi) => {
+        const fid  = `q_${si}_${vi}`;
+        const lbl  = v.vraag || v.naam || v.label || v.question || `Vraag ${vi+1}`;
+        const req  = v.vereist||v.required||v.verplicht ? 'required' : '';
+        const ph   = v.placeholder||v.voorbeeld||v.example||'';
+        return `<div class="fg">
+          <label class="flabel" for="${fid}">${esc(lbl)}${req ? ' *' : ''}</label>
+          ${buildInputField(v, fid, req, ph)}
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function buildFallbackForm(prefillId, prefillName) {
+  document.getElementById('formSections').innerHTML = `
+    <div class="form-section">
+      <div class="form-section-title">Product Informatie</div>
+      <div class="fg">
+        <label class="flabel" for="q_naam">Productnaam *</label>
+        <input class="finput" id="q_naam" type="text" required placeholder="bijv. Wireless Headphones Pro" value="${prefillName ? esc(prefillName) : ''}">
+      </div>
+      <div class="fg">
+        <label class="flabel" for="q_link">Product URL *</label>
+        <input class="finput" id="q_link" type="url" required placeholder="https://...">
+      </div>
+    </div>
+    <div class="form-section">
+      <div class="form-section-title">Doelgroep</div>
+      <div class="fg">
+        <label class="flabel" for="q_land">Doelland</label>
+        <input class="finput" id="q_land" type="text" value="Nederland">
+      </div>
+      <div class="fg">
+        <label class="flabel" for="q_taal">Doeltaal</label>
+        <input class="finput" id="q_taal" type="text" value="Nederlands">
+      </div>
+    </div>`;
+}
+
+function buildInputField(v, id, required, placeholder) {
+  const type = (v.type||'text').toLowerCase();
+  if (type==='textarea'||type==='tekst'||type==='text_long') {
+    return `<textarea class="finput finput-ta" id="${id}" ${required} rows="3" placeholder="${esc(placeholder)}"></textarea>`;
+  }
+  if ((type==='select'||type==='keuze'||type==='dropdown') && (v.opties||v.options)) {
+    const opts = (v.opties||v.options).map(o => {
+      const val = typeof o==='object' ? (o.value||o.waarde||o.id||o) : o;
+      const lbl = typeof o==='object' ? (o.label||o.naam||o.text||val) : o;
+      return `<option value="${esc(String(val))}">${esc(String(lbl))}</option>`;
+    }).join('');
+    return `<select class="finput" id="${id}" ${required}><option value="">Kies een optie…</option>${opts}</select>`;
+  }
+  const ht = type==='number'||type==='nummer' ? 'number'
+           : type==='email'  ? 'email'
+           : type==='url'||type==='link' ? 'url' : 'text';
+  return `<input class="finput" id="${id}" type="${ht}" ${required} placeholder="${esc(placeholder)}">`;
+}
+
+// ─── Submit Agent 0 ───────────────────────────────────────────────────
+async function submitAgent0(e) {
+  e.preventDefault();
+
+  // Collect all answers from form
+  const antwoorden = {};
+  document.getElementById('agentForm').querySelectorAll('input,textarea,select').forEach(el => {
+    if (!el.id) return;
+    const key = el.id; // keep full id as key, API can sort it out
+    antwoorden[key] = el.type === 'checkbox' ? el.checked : el.value.trim();
+  });
+
+  // If product id is known, include it
+  const payload = { antwoorden };
+  if (newProductId) payload.product_id = newProductId;
+
+  setModalState('processing');
+  clearMiniTerm();
+  startMiniPoll();
+  procStartTime = Date.now();
+
+  try {
+    const res = await fetch(`${API}/agent0/uitvoeren`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      signal: AbortSignal.timeout(60000), // 60s to get initial response
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const resp = await res.json();
+
+    newProductId = resp.product_id || resp.id || newProductId;
+    const status = (resp.status || resp.state || '').toLowerCase();
+
+    if (['klaar','done','completed','success'].includes(status)) {
+      finishProcessing(resp);
+    } else {
+      // Still running — poll for completion
+      pollForCompletion(resp.job_id || resp.taak_id || null);
+    }
+  } catch (err) {
+    stopProcessingPolls();
+    showModalError(err.message || 'Verbinding mislukt');
+  }
+}
+
+// ─── Mini terminal (processing state) ────────────────────────────────
+function clearMiniTerm() {
+  miniSeenLogs.clear();
+  document.getElementById('miniTerm').innerHTML = '<div class="mini-empty">Wachten op Agent 0 output…</div>';
+}
+
+function addMiniLog(raw) {
+  const term  = document.getElementById('miniTerm');
+  const empty = term.querySelector('.mini-empty');
+  if (empty) empty.remove();
+  const msg = logMessage(raw);
+  const cls = classifyLog(raw);
+  const lineClass = cls==='lt-ok'?'log-ok':cls==='lt-err'?'log-err':cls==='lt-agent'?'log-ag':'';
+  const div = document.createElement('div');
+  div.className = `mini-log-line ${lineClass}`;
+  div.textContent = `${logTimestamp(raw)}  ${msg}`;
+  term.appendChild(div);
+  term.scrollTop = term.scrollHeight;
+}
+
+function isAgent0Log(msg) {
+  return /agent.?0|agent 0|brand.interview|brand.manual|interview|manual/.test(msg);
+}
+
+// ─── Polling: mini logs during processing ─────────────────────────────
+function startMiniPoll() {
+  procPollInterval = setInterval(fetchMiniLogs, 2000);
+}
+
+async function fetchMiniLogs() {
+  try {
+    const res = await fetch(`${API}/logs`,{signal:AbortSignal.timeout(3000)});
+    if (!res.ok) return;
+    const data = await res.json();
+    const logs = Array.isArray(data) ? data : data?.logs||[];
+    for (const log of logs) {
+      const k = logKey(log);
+      // Main terminal
+      if (!seenLogs.has(k)) { seenLogs.add(k); appendLogEntry(log); }
+      // Mini terminal (agent0 logs only)
+      if (!miniSeenLogs.has(k)) {
+        miniSeenLogs.add(k);
+        if (isAgent0Log(logMessage(log).toLowerCase())) addMiniLog(log);
+      }
+    }
+  } catch (_) {}
+}
+
+// ─── Polling: agent0 completion ───────────────────────────────────────
+function pollForCompletion(jobId) {
+  completionInterval = setInterval(async () => {
+    // Timeout check
+    if (Date.now() - procStartTime > PROC_TIMEOUT_MS) {
+      stopProcessingPolls();
+      showModalError('Timeout: Brand manual genereren duurt te lang. Controleer de terminal voor meer info.');
+      return;
+    }
+
+    const endpoints = jobId
+      ? [`/agent0/status/${jobId}`, '/agent0/status']
+      : ['/agent0/status', '/status'];
+
+    for (const ep of endpoints) {
+      try {
+        const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(3000)});
+        if (!res.ok) continue;
+        const data = await res.json();
+        const s = (data.status||data.state||'').toLowerCase();
+        if (['klaar','done','completed','success'].includes(s)) {
+          newProductId = data.product_id || data.id || newProductId;
+          finishProcessing(data);
+          return;
+        }
+        if (['error','failed','fout'].includes(s)) {
+          showModalError(data.bericht || data.message || 'Agent 0 is mislukt');
+          return;
+        }
+        break; // Valid endpoint found, don't check others this round
+      } catch (_) {}
+    }
+  }, 3000);
+}
+
+function stopProcessingPolls() {
+  if (procPollInterval)   { clearInterval(procPollInterval);   procPollInterval   = null; }
+  if (completionInterval) { clearInterval(completionInterval); completionInterval = null; }
+}
+
+function finishProcessing(data) {
+  stopProcessingPolls();
+  newProductId = data?.product_id || data?.id || newProductId;
+  const naam = data?.product_naam || data?.naam || data?.name || '';
+  document.getElementById('doneProductName').textContent = naam ? `Product: ${naam}` : '';
+  setModalState('done');
+  fetchProducts();
+  toast('Brand Manual gegenereerd! 🎉','ok');
+}
+
+function showModalError(msg) {
+  stopProcessingPolls();
+  document.getElementById('errMsg').textContent = msg;
+  setModalState('error');
+}
+
+// ─── Start pipeline from modal (after brand manual done) ──────────────
+async function startPipelineFromModal() {
+  closeModal();
+  await pipelineStart(newProductId, null);
+}
+
+// ─── Connection status ─────────────────────────────────────────────────
+function setConn(state) {
+  document.getElementById('connDot').className = `conn-dot ${state}`;
+  document.getElementById('connTxt').textContent =
+    state==='ok' ? 'Verbonden' : state==='run' ? 'Pipeline draait' : 'Geen verbinding';
+  document.getElementById('lastUpdated').textContent =
+    new Date().toLocaleTimeString('nl-NL',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+async function checkConn() {
+  for (const ep of ['/','/status','/producten','/logs']) {
+    try {
+      const res = await fetch(`${API}${ep}`,{signal:AbortSignal.timeout(4000)});
+      if (res.ok) { setConn(pipeRunning?'run':'ok'); return; }
+    } catch (_) {}
+  }
+  document.getElementById('connDot').className = 'conn-dot err';
+  document.getElementById('connTxt').textContent = 'Geen verbinding';
+}
+
+// ─── Auto-scroll detection ─────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const term = document.getElementById('terminal');
+  term.addEventListener('scroll', () => {
+    autoScroll = term.scrollHeight - term.scrollTop - term.clientHeight < 60;
+  });
+});
+
+// ─── Toast ─────────────────────────────────────────────────────────────
+function toast(msg, type='info') {
+  const c   = document.getElementById('toasts');
+  const ico = {ok:'✓',err:'✕',info:'ℹ'}[type]||'•';
+  const cls = {ok:'toast-ok',err:'toast-err',info:'toast-info'}[type]||'toast-info';
+  const div = document.createElement('div');
+  div.className = `toast ${cls}`;
+  div.innerHTML = `<span class="toast-ico">${ico}</span><span>${esc(msg)}</span>`;
+  c.appendChild(div);
+  setTimeout(() => {
+    div.style.opacity='0'; div.style.transform='translateX(110%)';
+    setTimeout(() => div.remove(), 320);
+  }, 3500);
+}
+
+// ─── Boot ──────────────────────────────────────────────────────────────
+renderAgents();
+checkConn();
+fetchLogs();
+fetchProducts();
+fetchStatus();
+
+setInterval(fetchLogs,    3000);
+setInterval(() => { fetchProducts(); fetchStatus(); }, 5000);
+setInterval(checkConn,   15000);
+</script>
+</body>
+</html>
