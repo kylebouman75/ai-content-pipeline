@@ -9,6 +9,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from pydantic import BaseModel
 import subprocess
 import threading
+import sys
 import json
 import urllib.request
 import urllib.error
@@ -82,6 +83,74 @@ def debug():
 @app.get("/")
 def root():
     return {"status": "AI Content Pipeline API draait", "versie": "1.0"}
+
+
+# ============================================================
+# AGENT 0 ENDPOINTS
+# ============================================================
+
+@app.get("/agent0/vragen")
+def get_interview_vragen():
+    """Geeft alle interview secties en vragen terug voor het dashboard."""
+    try:
+        sys.path.insert(0, PIPELINE_DIR)
+        import agent0
+        return {"secties": agent0.get_interview_vragen()}
+    except Exception as e:
+        return {"error": str(e)}
+
+
+class Agent0Data(BaseModel):
+    doelland:    Optional[str] = "Nederland"
+    doeltaal:    Optional[str] = "Nederlands"
+    product_url: Optional[str] = ""
+    secties:     dict = {}
+
+
+@app.post("/agent0/uitvoeren")
+def uitvoeren_agent0(data: Agent0Data, background_tasks: BackgroundTasks):
+    """Voert Agent 0 uit met de antwoorden uit het dashboard."""
+    if pipeline_status["draait"]:
+        return {"success": False, "bericht": "Pipeline draait al — wacht tot die klaar is"}
+
+    antwoorden = {
+        "doelland":    data.doelland,
+        "doeltaal":    data.doeltaal,
+        "product_url": data.product_url,
+        "secties":     data.secties
+    }
+
+    background_tasks.add_task(run_agent0_taak, antwoorden)
+    return {"success": True, "bericht": "Agent 0 gestart — brand manual wordt gegenereerd"}
+
+
+def run_agent0_taak(antwoorden: dict):
+    """Voert Agent 0 uit als background taak."""
+    pipeline_status["draait"]     = True
+    pipeline_status["huidige_agent"] = 0
+
+    log_toevoegen("━━━ AGENT 0 — BRAND INTERVIEW ━━━", "gold")
+    log_toevoegen("Brand manual genereren...", "amber")
+
+    try:
+        import sys
+        sys.path.insert(0, PIPELINE_DIR)
+        import agent0
+
+        resultaat = agent0.run_via_api(antwoorden)
+
+        if resultaat.get("success"):
+            log_toevoegen(f"✓ Brand manual klaar voor: {resultaat.get('product_naam')}", "green")
+            log_toevoegen(f"✓ Supabase ID: {resultaat.get('product_id')}", "green")
+            log_toevoegen("Agent 0 voltooid — start Agent 2 voor marktonderzoek", "gold")
+        else:
+            log_toevoegen(f"✗ Fout: {resultaat.get('bericht')}", "red")
+
+    except Exception as e:
+        log_toevoegen(f"✗ Agent 0 fout: {str(e)}", "red")
+    finally:
+        pipeline_status["draait"]     = False
+        pipeline_status["huidige_agent"] = None
 
 @app.get("/dashboard")
 async def dashboard():
